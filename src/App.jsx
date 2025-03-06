@@ -60,8 +60,10 @@ import DesignerPage from './pages/DesignerPage';
 import Checkout from './pages/Checkout';
 import Register from './pages/Register';
 import Login from './pages/Login';
+
 import NewProductCarousel from './components/NewProductCarousel';
 import ContactPage from './pages/ContactPage';  // Đã có rồi, không cần thêm nữa
+
 
 const AppContent = () => {
   const location = useLocation();  // Lấy đường dẫn hiện tại
@@ -69,8 +71,10 @@ const AppContent = () => {
   return (
     <>
       <Header />
+
+      
       {/* Chỉ hiển thị Carousel khi ở trang chủ (/) */}
-      {location.pathname === '/' && <NewProductCarousel />}
+      {/* {location.pathname === '/' && <NewProductCarousel />} */}
       <main className="min-h-screen bg-gray-50">
         <Routes>
           <Route path="/" element={<Home />} />

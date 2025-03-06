@@ -1,8 +1,4 @@
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 /* Font chữ và màu sắc mặc định */
 :root {
   --primary-color: #ff6b6b;

@@ -1,18 +1,23 @@
 /** @type {import('tailwindcss').Config} */
-export const content = [
-    "./index.html",
-    "./src/**/*.{js,jsx,ts,tsx}"
-];
-export const theme = {
-    extend: {
+export default {
+    content: [
+      "./index.html",
+      "./src/**/*.{js,jsx,ts,tsx}"
+    ],
+    theme: {
+      extend: {
         colors: {
-            primary: "#FF6B6B", // Màu chính (có thể tuỳ chỉnh)
-            secondary: "#1A202C", // Màu phụ
+          primary: "#FF6B6B",
+          secondary: "#1A202C",
         },
         fontFamily: {
-            sans: ['Inter', 'sans-serif'], // Font mặc định (nếu cần)
+          sans: ['Inter', 'sans-serif'],
         },
+        width: {
+          custom: "300px" // Thêm width tùy chỉnh
+        }
+      },
     },
-};
-export const plugins = [];
+    plugins: [],
+  };
   

@@ -69,23 +69,23 @@ nav a:hover {
 .card h2 {
   @apply text-lg font-semibold text-[var(--text-color)] mb-1;
 }
-
+/* 
 .card p {
   @apply text-sm text-gray-600 mb-2;
-}
+} */
 
 /* Xóa viền dư thừa của các phần tử bên trong card */
-.card * {
+/* .card * {
   border: none;
   box-shadow: none;
 }
 
 /* Loại bỏ hoàn toàn viền dư thừa */
-* {
+/* * {
   border: none !important;
   box-shadow: none !important;
-}
-
+} */
+ */ */
 
 
 /* #root {
@@ -126,7 +126,4 @@ nav a:hover {
 .card {
   padding: 2em;
 }
-
-.read-the-docs {
-  color: #888;
-} */
+ */
