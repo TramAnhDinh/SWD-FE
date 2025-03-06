@@ -1,0 +1,132 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Font chữ và màu sắc mặc định */
+:root {
+  --primary-color: #3b82f6; /* Màu xanh nhạt hiện đại hơn */
+  --secondary-color: #4e4e4e;
+  --background-color: #f9f9f9;
+  --text-color: #333;
+}
+
+body {
+  @apply bg-[var(--background-color)] text-[var(--text-color)] font-[Poppins];
+}
+
+/* Liên kết và tiêu đề */
+a {
+  @apply font-medium text-[var(--primary-color)] no-underline transition duration-200;
+}
+
+a:hover {
+  @apply text-blue-500;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  @apply text-[var(--text-color)] font-bold;
+}
+
+/* Nút bấm */
+button {
+  @apply bg-[var(--primary-color)] text-white py-2 px-4 rounded-md transition duration-200 border-none shadow-md;
+}
+
+button:hover {
+  @apply bg-blue-600;
+}
+
+/* Thanh menu */
+nav {
+  @apply flex justify-center bg-[#1b1e3d] text-white py-2 border-none shadow-md m-0;
+}
+
+/* Link trong menu */
+nav a {
+  @apply px-4 py-2 rounded-md transition duration-200 text-sm border-none shadow-none;
+}
+
+nav a:hover {
+  @apply bg-neutral-700;
+}
+
+/* Xử lý phần header */
+.header-container {
+  @apply bg-neutral-900 m-0 p-0 border-none shadow-none;
+}
+
+/* Thẻ card sản phẩm */
+.card {
+  @apply bg-white rounded-lg p-4 text-center m-0 border-none shadow-md transition duration-200 hover:scale-105;
+}
+
+/* Hình ảnh sản phẩm trong card */
+.card img {
+  @apply w-full h-40 object-cover rounded-md mb-2;
+}
+
+/* Tiêu đề và giá sản phẩm */
+.card h2 {
+  @apply text-lg font-semibold text-[var(--text-color)] mb-1;
+}
+
+.card p {
+  @apply text-sm text-gray-600 mb-2;
+}
+
+/* Xóa viền dư thừa của các phần tử bên trong card */
+.card * {
+  border: none;
+  box-shadow: none;
+}
+
+/* Loại bỏ hoàn toàn viền dư thừa */
+* {
+  border: none !important;
+  box-shadow: none !important;
+}
+
+
+
+/* #root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+} */
