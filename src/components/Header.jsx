@@ -97,29 +97,28 @@ const Header = () => {
 
         <div className="relative group">
           <button className="hover:text-orange-400 text-xl flex items-center">
-             ĐỒNG PHỤC <ChevronDown className="ml-2" />
+          THIẾT KẾ ÁO <ChevronDown className="ml-2" />
           </button>
           <div className="absolute left-0 top-full w-48 bg-black border border-gray-700 rounded-lg  hidden group-hover:block z-50">
-            <Link to="/design/custom" className="block px-4 py-2 hover:bg-gray-800">Tùy chỉnh</Link>
-            <Link to="/design/templates" className="block px-4 py-2 hover:bg-gray-800">Mẫu có sẵn</Link>
+            <Link to="/design/custom" className="block px-4 py-2 hover:bg-gray-800">TUỲ CHỈNH</Link>
+            <Link to="/design/mau-co-san" className="block px-4 py-2 hover:bg-gray-800">MẪU CÓ SẴN</Link>
           </div>
         </div>
         {/* Dropdown Thiết kế áo trên PC */}
         <div className="relative group">
           <button className="hover:text-orange-400 text-xl flex items-center">
-            THIẾT KẾ ÁO <ChevronDown className="ml-2" />
+          ĐỒNG PHỤC <ChevronDown className="ml-2" />
           </button>
           <div className="absolute left-0   top-full max-w-64 w-56 bg-black border border-gray-700 rounded-lg  hidden group-hover:block z-50">
-          <Link to="/design" className="block px-4 py-2 hover:bg-gray-800 ">THIẾT KẾ TRANG PHỤC</Link>
             <Link to="/design/bang-gia-dong-phuc" className="block px-4 py-2 hover:bg-gray-800 ">BẢNG GIÁ ĐỒNG PHỤC</Link>
-            <Link to="/design/templates" className="block px-4 py-2 hover:bg-gray-800">BẢNG GIÁ ÁO LỚP</Link>
-            <Link to="/design/custom" className="block px-4 py-2 hover:bg-gray-800">BẢNG GIÁ ĐỒNG PHỤC</Link>
-            <Link to="/design/templates" className="block px-4 py-2 hover:bg-gray-800">BẢNG GIÁ ÁO LỚP</Link>
+            <Link to="/design/bang-gia-ao-lop" className="block px-4 py-2 hover:bg-gray-800">BẢNG GIÁ ÁO LỚP</Link>
+            <Link to="/design/bang-gia-phu-kien" className="block px-4 py-2 hover:bg-gray-800">BẢNG GIÁ PHỤ KIỆN</Link>
+            <Link to="/design/bang-gia-dich-vu" className="block px-4 py-2 hover:bg-gray-800">BẢNG GIÁ DỊCH VỤ</Link>
           
           </div>
         </div>
 
-        <Link to="/lien-he" className="hover:text-orange-400 text-xl">Liên Hệ</Link>
+        <Link to="/lien-he" className="hover:text-orange-400 text-xl">LIÊN HỆ</Link>
         <Link to="/cart" className="hover:text-orange-400 relative">
           <ShoppingCart />
           {totalItems > 0 && (
