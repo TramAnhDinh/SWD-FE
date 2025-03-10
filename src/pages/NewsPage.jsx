@@ -4,16 +4,15 @@ import c1 from "../assets/c/c1.png";
 import c2 from "../assets/c/c2.png";
 import c3 from "../assets/c/c3.png";
 
-const categories = ["Thông tin", "Áo Lớp", "Cẩm Nang"];
 
 const articles = [ 
   { id: 1, title: "Nên Chọn Áo Bóng Chày Hay Áo Thun?", image: c1, category: "Áo Lớp" },
   { id: 2, title: "Tổng Hợp Các Mẫu Áo Lớp Polo", image: c2, category: "Áo Lớp" },
-  { id: 3, title: "Mẫu Áo Lớp Best-Seller", image: c3, category: "Cẩm Nang" },
+  { id: 3, title: "Mẫu Áo Lớp Best-Seller", image: c3, category: "Áo Lớp" },
 ];
 
 const NewsPage = () => {
-  const [selectedCategory, setSelectedCategory] = useState("Thông tin");
+  const [selectedCategory] = useState("Áo Lớp");
 
   const filteredArticles =
     selectedCategory === "Thông tin"
@@ -26,17 +25,7 @@ const NewsPage = () => {
       <div className="container mx-auto p-6 text-center">
         <h2 className="text-3xl font-bold mb-4 text-yellow-400">TIN TỨC ÁO LỚP</h2>
         <div className="flex justify-center space-x-2 mb-6">
-          {categories.map((category, index) => (
-            <button
-              key={index}
-              onClick={() => setSelectedCategory(category)}
-              className={`px-4 py-2 rounded text-black font-bold transition ${
-                selectedCategory === category ? "bg-yellow-600" : "bg-yellow-500 hover:bg-yellow-600"
-              }`}
-            >
-              {category}
-            </button>
-          ))}
+         
         </div>
 
         {/* Danh sách bài viết */}

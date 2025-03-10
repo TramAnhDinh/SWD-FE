@@ -4,7 +4,6 @@ import r1 from "../assets/r/r1.png";
 import r2 from "../assets/r/r2.png";
 import r3 from "../assets/r/r3.png";
 
-const categories = ["Thông tin", "Áo Lớp", "Cẩm Nang"];
 
 const articles = [ 
   { id: 1, title: "Hướng dẫn bảo quản vợt pickleball đúng cách", image: r1, category: "Áo Lớp" },
@@ -13,7 +12,7 @@ const articles = [
 ];
 
 const HandPage = () => {
-  const [selectedCategory, setSelectedCategory] = useState("Thông tin");
+  const [selectedCategory] = useState("Thông tin");
 
   const filteredArticles =
     selectedCategory === "Thông tin"
@@ -26,17 +25,7 @@ const HandPage = () => {
       <div className="container mx-auto p-6 text-center">
         <h2 className="text-3xl font-bold mb-4 text-yellow-400">CẨM NANG</h2>
         <div className="flex justify-center space-x-2 mb-6">
-          {categories.map((category, index) => (
-            <button
-              key={index}
-              onClick={() => setSelectedCategory(category)}
-              className={`px-4 py-2 rounded text-black font-bold transition ${
-                selectedCategory === category ? "bg-yellow-600" : "bg-yellow-500 hover:bg-yellow-600"
-              }`}
-            >
-              {category}
-            </button>
-          ))}
+          
         </div>
 
         {/* Danh sách bài viết */}
