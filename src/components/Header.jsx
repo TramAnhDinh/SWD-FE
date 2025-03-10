@@ -118,6 +118,16 @@ const Header = () => {
           </div>
         </div>
 
+        <div className="relative group">
+          <button className="hover:text-orange-400 text-xl flex items-center">
+          BLOG <ChevronDown className="ml-2" />
+          </button>
+          <div className="absolute left-0   top-full max-w-64 w-56 bg-black border border-gray-700 rounded-lg  hidden group-hover:block z-50">
+            <Link to="/blog" className="block px-4 py-2 hover:bg-gray-800 ">THÔNG TIN</Link>
+            <Link to="/blog/class" className="block px-4 py-2 hover:bg-gray-800">ÁO LỚP</Link>
+            <Link to="/blog/b" className="block px-4 py-2 hover:bg-gray-800">CẨM NANG</Link>
+          </div>
+        </div>
         <Link to="/lien-he" className="hover:text-orange-400 text-xl">LIÊN HỆ</Link>
         <Link to="/cart" className="hover:text-orange-400 relative">
           <ShoppingCart />

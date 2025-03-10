@@ -57,19 +57,13 @@ const DesignerPage = () => {
         <div className="flex justify-center items-center bg-gray-100 p-4 rounded">
           <Stage width={400} height={500} ref={stageRef}>
             <Layer>
-              <Rect width={400} height={500} fill={shirtColor} />
-              <Text
-                text={text}
-                fontSize={24}
-                fill={textColor}
-                draggable
-                x={50}
-                y={200}
-              />
-              {uploadedImage && (
-                <Image image={image} draggable x={50} y={50} />
-              )}
-            </Layer>
+          <Rect width={400} height={500} fill={shirtColor} />
+            {uploadedImage && (
+          <Image image={image} draggable x={50} y={50} />
+        )}
+        <Text text={text} fontSize={24} fill={textColor} draggable x={50} y={200} />
+        </Layer>
+
           </Stage>
         </div>
         <div className="space-y-4">
@@ -134,3 +128,5 @@ const DesignerPage = () => {
 };
 
 export default DesignerPage;
+
+

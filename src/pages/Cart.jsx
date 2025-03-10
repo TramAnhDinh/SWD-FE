@@ -1,82 +1,3 @@
-// import React from 'react';
-// import { useSelector, useDispatch } from 'react-redux';
-// import { removeFromCart, clearCart } from '../redux/slices/cartSlice';
-// import { Link, useNavigate } from 'react-router-dom';
-
-// const Cart = () => {
-//   const cartItems = useSelector((state) => state.cart?.items ?? []);  // Sử dụng giá trị mặc định là mảng rỗng nếu undefined
-//   const dispatch = useDispatch();
-//   const navigate = useNavigate();
-
-//   // Tính tổng giá tiền
-//   const totalPrice = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
-
-//   const handleCheckout = () => navigate('/checkout');  // Hàm chuyển hướng tới trang thanh toán
-
-//   return (
-//     <div className="max-w-4xl mx-auto py-8">
-//       <h2 className="text-2xl font-bold mb-6">Giỏ hàng</h2>
-
-//       {/* Kiểm tra nếu giỏ hàng trống */}
-//       {cartItems.length === 0 ? (
-//         <div className="text-center">
-//           <p className="text-gray-600 mb-4">Giỏ hàng của bạn đang trống.</p>
-//           <button
-//             onClick={() => navigate('/')}
-//             className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
-//           >
-//             Tiếp tục mua sản phẩm
-//           </button>
-//         </div>
-//       ) : (
-//         <>
-//           <ul>
-//             {cartItems.map((item) => (
-//               <li key={item.id} className="mb-4 border-b pb-4 flex justify-between items-center">
-//                 <div>
-//                   <p className="font-semibold">{item.name} x {item.quantity}</p>
-//                   <p className="text-gray-600">{(item.price * item.quantity).toLocaleString()} USD</p>
-//                 </div>
-//                 <button
-//                   onClick={() => dispatch(removeFromCart(item.id))}
-//                   className="text-red-500 hover:text-red-700 transition"
-//                 >
-//                   Xóa
-//                 </button>
-//               </li>
-//             ))}
-//           </ul>
-
-//           <p className="text-xl font-bold mt-6">Tổng: {totalPrice.toLocaleString()} USD</p>
-
-//           <div className="flex gap-4 mt-4">
-//             <button
-//               onClick={() => dispatch(clearCart())}
-//               className="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 transition"
-//             >
-//               Xóa hết
-//             </button>
-//             <button
-//               onClick={() => navigate('/')}
-//               className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
-//             >
-//               Tiếp tục mua sản phẩm
-//             </button>
-//             <button
-//               onClick={handleCheckout}
-//               className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 transition"
-//             >
-//               Thanh Toán
-//             </button>
-//           </div>
-//         </>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default Cart;
-
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { removeFromCart, clearCart } from '../redux/slices/cartSlice';
@@ -89,61 +10,70 @@ const Cart = () => {
 
   const totalPrice = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
 
-  const handleCheckout = () => navigate('/checkout-confirmation'); // Chuyển đến trang xác nhận thanh toán
+  const handleCheckout = () => navigate('/checkout-confirmation');
 
   return (
-    <div className="max-w-4xl mx-auto py-8">
-      <h2 className="text-2xl font-bold mb-6">Giỏ hàng</h2>
+    <div className="max-w-5xl mx-auto py-10 px-6">
+      <h2 className="text-3xl font-bold mb-6 text-center">🛒 Giỏ hàng của bạn</h2>
 
       {cartItems.length === 0 ? (
         <div className="text-center">
-          <p className="text-gray-600 mb-4">Giỏ hàng của bạn đang trống.</p>
+          <p className="text-gray-600 mb-4 text-lg">Giỏ hàng của bạn đang trống.</p>
           <button
             onClick={() => navigate('/')}
-            className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
+            className="bg-blue-600 text-white py-2 px-6 rounded-lg hover:bg-blue-700 transition shadow-md"
           >
-            Tiếp tục mua sản phẩm
+            🛍 Tiếp tục mua sắm
           </button>
         </div>
       ) : (
         <>
-          <ul>
-            {cartItems.map((item) => (
-              <li key={item.id} className="mb-4 border-b pb-4 flex justify-between items-center">
-                <div>
-                  <p className="font-semibold">{item.name} x {item.quantity}</p>
-                  <p className="text-gray-600">{(item.price * item.quantity).toLocaleString()} USD</p>
-                </div>
-                <button
-                  onClick={() => dispatch(removeFromCart(item.id))}
-                  className="text-red-500 hover:text-red-700 transition"
-                >
-                  Xóa
-                </button>
-              </li>
-            ))}
-          </ul>
+          <div className="bg-white shadow-lg rounded-lg p-6">
+            <ul>
+              {cartItems.map((item) => (
+                <li key={item.id} className="flex justify-between items-center py-4 border-b">
+                  <div className="flex items-center gap-4">
+                    {item.image && (
+                      <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded-lg shadow" />
+                    )}
+                    <div>
+                      <p className="text-lg font-semibold">{item.name} × {item.quantity}</p>
+                      <p className="text-gray-600">{(item.price * item.quantity).toLocaleString()} USD</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => dispatch(removeFromCart(item.id))}
+                    className="text-red-500 hover:text-red-700 transition"
+                  >
+                    ❌ Xóa
+                  </button>
+                </li>
+              ))}
+            </ul>
 
-          <p className="text-xl font-bold mt-6">Tổng: {totalPrice.toLocaleString()} USD</p>
+            <div className="mt-6 text-right">
+              <p className="text-xl font-bold">Tổng cộng: {totalPrice.toLocaleString()} USD</p>
+            </div>
+          </div>
 
-          <div className="flex gap-4 mt-4">
+          <div className="flex flex-wrap justify-center gap-4 mt-6">
             <button
               onClick={() => dispatch(clearCart())}
-              className="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 transition"
+              className="bg-red-500 text-white py-2 px-6 rounded-lg hover:bg-red-600 transition shadow-md"
             >
-              Xóa hết
+              🗑 Xóa hết
             </button>
             <button
               onClick={() => navigate('/')}
-              className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
+              className="bg-blue-600 text-white py-2 px-6 rounded-lg hover:bg-blue-700 transition shadow-md"
             >
-              Tiếp tục mua sản phẩm
+              🔄 Tiếp tục mua hàng
             </button>
             <button
               onClick={handleCheckout}
-              className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 transition"
+              className="bg-green-500 text-white py-2 px-6 rounded-lg hover:bg-green-600 transition shadow-md"
             >
-              Thanh Toán
+              💳 Thanh toán
             </button>
           </div>
         </>

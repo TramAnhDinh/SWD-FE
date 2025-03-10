@@ -69,6 +69,12 @@ import PricingAccessory from './pages/PricingAccessory';
 import PricingService from './pages/PricingService';
 import DesignSamples from './pages/DesignSamples';
 import CheckoutConfirmation from './pages/CheckoutConfirmation';
+import InfoPage from './pages/InfoPage';
+import ArticleDetail from './pages/ArticleDetail';
+import NewsPage from './pages/NewsPage';
+import NewsDetail from './pages/NewsDetail';
+import HandPage from './pages/HandPage';
+import HandDetail from './pages/HandDetail';
 
 const AppContent = () => {
   const location = useLocation();  // Lấy đường dẫn hiện tại
@@ -94,8 +100,14 @@ const AppContent = () => {
           <Route path="/lien-he" element={<ContactPage />} />
           <Route path="/design/bang-gia-dong-phuc" element={<PricingTable />} />
           <Route path="/design/bang-gia-ao-lop" element={<PricingClass />} />
-          <Route path="/design/bang-gia-phu-kien" element={<PricingAccessory />} />\
+          <Route path="/design/bang-gia-phu-kien" element={<PricingAccessory />} />
           <Route path="/design/bang-gia-dich-vu" element={<PricingService />} />
+          <Route path="/blog" element={<InfoPage />} />
+          <Route path="/blog/:id" element={<ArticleDetail />} />
+          <Route path="/blog/class" element={<NewsPage />} />
+          <Route path="/blog/class/:id" element={<NewsDetail />} />
+          <Route path="/blog/b" element={<HandPage />} />
+          <Route path="/blog/b/:id" element={<HandDetail />} />
         </Routes>
       </main>
       <Footer />
