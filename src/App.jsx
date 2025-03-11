@@ -60,6 +60,8 @@ import DesignerPage from './pages/DesignerPage';
 import Checkout from './pages/Checkout';
 import Register from './pages/Register';
 import Login from './pages/Login';
+import StaffPage from "./pages/StaffPage";
+
 
 import NewProductCarousel from './components/NewProductCarousel';
 import ContactPage from './pages/ContactPage';  // Đã có rồi, không cần thêm nữa
@@ -75,6 +77,9 @@ import NewsPage from './pages/NewsPage';
 import NewsDetail from './pages/NewsDetail';
 import HandPage from './pages/HandPage';
 import HandDetail from './pages/HandDetail';
+import OrderStatus from './pages/OrderStatus';
+import OrderTracking from './pages/OrderTracking';
+import ProfilePage from './pages/ProfilePage';
 
 const AppContent = () => {
   const location = useLocation();  // Lấy đường dẫn hiện tại
@@ -108,6 +113,10 @@ const AppContent = () => {
           <Route path="/blog/class/:id" element={<NewsDetail />} />
           <Route path="/blog/b" element={<HandPage />} />
           <Route path="/blog/b/:id" element={<HandDetail />} />
+          <Route path="/order-status" element={<OrderStatus />} />
+          <Route path="/order-tracking" element={<OrderTracking />} />
+          <Route path="/staff" element={<StaffPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
         </Routes>
       </main>
       <Footer />
