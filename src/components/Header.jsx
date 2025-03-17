@@ -365,6 +365,8 @@ const Header = () => {
 
   // Lấy user & role từ Redux
   const { user, role } = useSelector((state) => state.user);
+  console.log("User Role:", role);
+
   
   // Lấy giỏ hàng từ Redux
   const cart = useSelector((state) => state.cart.items ?? []);
@@ -507,6 +509,12 @@ const Header = () => {
               {/* <Link to="/staff" className="block px-4 py-2 hover:bg-gray-800">TRANG CÁ NHÂN</Link> */}
               {role === "member" && <Link to="/member" className="block px-4 py-2 hover:bg-gray-800">TRANG CÁ NHÂN</Link>}
               {role === "staff" && <Link to="/staff" className="block px-4 py-2 hover:bg-gray-800">TRANG CÁ NHÂN</Link>}
+
+              {role !== "staff" && (
+              <button className="hover:text-orange-400 text-xl flex items-center">
+              THIẾT KẾ ÁO <ChevronDown className="ml-2" />
+              </button>
+              )}
 
               {/* <Link to="/member" className="block px-4 py-2 hover:bg-gray-800">TRANG CÁ NHÂN</Link> */}
               {/* {role === "staff" && <Link to="/staff" className="block px-4 py-2 hover:bg-gray-800">STAFF</Link>} */}

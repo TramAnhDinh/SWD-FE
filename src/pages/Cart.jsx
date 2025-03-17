@@ -91,14 +91,15 @@ import { useNavigate } from "react-router-dom";
 
 const Cart = () => {
   const cartItems = useSelector((state) => state.cart?.items ?? []);
-  const userRole = useSelector((state) => state.auth.user.role); // Lấy role từ Redux
+  const userRole = useSelector((state) => state.auth.user?.role ?? "guest"); // Mặc định là "guest"
+  // const userRole = useSelector((state) => state.auth.user.role); // Lấy role từ Redux
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const totalPrice = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
 
   const handleCheckout = () => {
-    if (userRole === "staff") {
+    if (userRole && userRole === "staff") {
       alert("Nhân viên không được phép mua hàng!");
       return;
     }
@@ -133,7 +134,7 @@ const Cart = () => {
                       <p className="text-lg font-semibold">
                         {item.name} × {item.quantity}
                       </p>
-                      <p className="text-gray-600">{(item.price * item.quantity).toLocaleString()} USD</p>
+                      <p className="text-gray-600">{(item.price * item.quantity).toLocaleString()} VND</p>
                     </div>
                   </div>
                   {userRole !== "staff" && ( // Ẩn nút xóa nếu là Staff
@@ -149,7 +150,7 @@ const Cart = () => {
             </ul>
 
             <div className="mt-6 text-right">
-              <p className="text-xl font-bold">Tổng cộng: {totalPrice.toLocaleString()} USD</p>
+              <p className="text-xl font-bold">Tổng cộng: {totalPrice.toLocaleString()} VND</p>
             </div>
           </div>
 

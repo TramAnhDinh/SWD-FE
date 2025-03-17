@@ -5,15 +5,17 @@ import contactReducer from './slices/contactSlice';  // Thêm dòng này
 import orderReducer from './slices/orderSlice';
 import userReducer from "./slices/userSlice";
 import productsReducer from './slices/productsSlice';
-
-
+import categoryReducer from "./slices/categorySlice";
+import authReducer from "./authSlice"; 
 const store = configureStore({
   reducer: {
     cart: cartSlice,
     order: orderReducer,
     user: userReducer,
     products: productsReducer,
-    contact: contactReducer,  // Đăng ký reducer mới
+    contact: contactReducer,  
+    category: categoryReducer,
+    auth: authReducer,
   },
 });
 
