@@ -415,8 +415,8 @@ const DesignSamples = () => {
   
 
   const filters = [
-    { name: "PHÂN LOẠI", options: ["Áo lớp", "Áo công ty", "Áo nhóm", "Phụ kiện"] },
-    { name: "LOẠI SẢN PHẨM", options: ["Áo Bóng Bầu Dục", "Áo Polo", "Áo Polo Zippy", "Áo thun", "Áo Tie Line Polo", "Bóng chày"] },
+    { name: "PHÂN LOẠI", options: ["Áo Sơ Mi", "Áo Thun"] },
+    { name: "LOẠI SẢN PHẨM", options: ["Áo Sơ Mi", "Áo Thun"] },
   ];
 
   // Lọc sản phẩm theo từ khóa tìm kiếm & bộ lọc danh mục
@@ -477,10 +477,16 @@ const DesignSamples = () => {
                 className="bg-[#1f1f1f] p-4 rounded-md shadow-md hover:scale-105 transition-transform"
               >
                 <img
-                  src={product.image ? product.image.replace(/\\/g, "/") : "/placeholder.png"}
+                  src={product.image ? `https://localhost:7163/uploads/${product.image.split("\\").pop()}` : "/placeholder.png"}
                   alt={product.productName}
                   className="w-full h-60 object-cover rounded-md mb-2 hover:opacity-80 transition-opacity"
                 />
+
+                {/* <img
+                  src={product.image ? product.image.replace(/\\/g, "/") : "/placeholder.png"}
+                  alt={product.productName}
+                  className="w-full h-60 object-cover rounded-md mb-2 hover:opacity-80 transition-opacity"
+                /> */}
                 <h3 className="text-center text-xl mb-2">{product.productName}</h3>
                 <p className="text-center text-lg font-semibold mb-2">{product.price.toLocaleString()} VND</p>
                 <button 

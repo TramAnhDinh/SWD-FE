@@ -624,7 +624,7 @@ const StaffPage = () => {
                                 <td>{product.stockInStorage}</td>
                                 <td>
                                     <img
-                                        src={`http://localhost:7163/uploads/${product.image?.split("\\").pop()}`}
+                                        src={`https://localhost:7163/uploads/${product.image?.split("\\").pop()}`}
                                         alt={product.productName}
                                         className="product-image"
                                     />
