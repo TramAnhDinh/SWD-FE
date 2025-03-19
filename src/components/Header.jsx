@@ -508,13 +508,10 @@ const Header = () => {
             <div className="absolute right-0 top-full w-48 bg-black border border-gray-700 rounded-lg hidden group-hover:block z-50">
               {/* <Link to="/staff" className="block px-4 py-2 hover:bg-gray-800">TRANG CÁ NHÂN</Link> */}
               {role === "member" && <Link to="/member" className="block px-4 py-2 hover:bg-gray-800">TRANG CÁ NHÂN</Link>}
+            
               {role === "staff" && <Link to="/staff" className="block px-4 py-2 hover:bg-gray-800">TRANG CÁ NHÂN</Link>}
 
-              {role !== "staff" && (
-              <button className="hover:text-orange-400 text-xl flex items-center">
-              THIẾT KẾ ÁO <ChevronDown className="ml-2" />
-              </button>
-              )}
+              
 
               {/* <Link to="/member" className="block px-4 py-2 hover:bg-gray-800">TRANG CÁ NHÂN</Link> */}
               {/* {role === "staff" && <Link to="/staff" className="block px-4 py-2 hover:bg-gray-800">STAFF</Link>} */}
