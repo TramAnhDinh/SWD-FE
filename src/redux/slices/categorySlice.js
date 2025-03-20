@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
-const API_BASE_URL = "http://localhost:7163/api/Category";
+const API_BASE_URL = "https://localhost:7163/api/Category";
 
 /* 🔄 Lấy danh sách danh mục */
 export const fetchCategories = createAsyncThunk("categories/fetchCategories", async () => {

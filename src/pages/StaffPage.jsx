@@ -628,8 +628,6 @@ const StaffPage = () => {
                                         alt={product.productName}
                                         className="product-image"
                                     />
-                                    {/* <img src={`http://localhost:7163/api/upload/image/${product.image}`} 
-                                    alt={product.productName} className="product-image" /> */}
 
                                 </td>
                                 <td>{product.description}</td>
