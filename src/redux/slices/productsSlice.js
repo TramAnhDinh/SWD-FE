@@ -585,21 +585,188 @@
 
 // export default productsSlice.reducer;
 
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+// import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
+
+// const API_URL = "https://localhost:7163/api/Product"; 
+
+// export const fetchProducts = createAsyncThunk("products/fetchProducts", async () => {
+//   try {
+//     const response = await fetch("https://localhost:7163/api/Product");
+
+//     if (!response.ok) throw new Error("Lỗi khi lấy dữ liệu sản phẩm!");
+
+//     const data = await response.json();
+//     console.log("API Product Response:", data);
+
+//     // Kiểm tra chính xác xem `data` chứa danh sách sản phẩm ở đâu
+//     if (Array.isArray(data?.data)) return data.data;
+//     if (Array.isArray(data?.data?.$values)) return data.data.$values;
+    
+//     return [];
+//   } catch (error) {
+//     console.error("Lỗi fetchProducts:", error);
+//     return [];
+//   }
+// });
+
+// //xoá sản phẩm
+// export const deleteProduct = createAsyncThunk(
+//   "products/deleteProduct",
+//   async (productId, { rejectWithValue }) => {
+//     try {
+//       const response = await fetch(`https://localhost:7163/api/Product/${productId}`, {
+//         method: "DELETE",
+//       });
+
+//       if (!response.ok) throw new Error("Lỗi khi xóa sản phẩm!");
+
+//       console.log(`Sản phẩm ${productId} đã bị xóa thành công.`);
+
+//       return productId; // Trả về ID để cập nhật Redux state
+//     } catch (error) {
+//       console.error("Lỗi deleteProduct:", error);
+//       return rejectWithValue(error.message);
+//     }
+//   }
+// );
+
+// // Thêm sản phẩm mới
+// export const addProduct = createAsyncThunk(
+//   "products/addProduct",
+//   async (product, { dispatch, rejectWithValue }) => {
+//     try {
+//       if (!product.categoryId) {
+//         return rejectWithValue("Danh mục sản phẩm là bắt buộc!");
+//       }
+
+//       // Kiểm tra dữ liệu trước khi gửi lên API
+//       const newProductData = {
+//         name: product.name,
+//         price: product.price,
+//         stock: product.stock,
+//         imageUrl: product.imageUrl,
+//         categoryId: product.categoryId,
+//         isDelete: false, // Đảm bảo sản phẩm mới không bị xóa
+//       };
+
+//       console.log("📤 Dữ liệu gửi lên API:", newProductData);
+
+//       const response = await fetch("https://localhost:7163/api/Product", {
+//         method: "POST",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify(newProductData),
+//       });
+
+//       if (!response.ok) {
+//         const errorText = await response.text(); // Lấy lỗi chi tiết
+//         console.error("❌ Lỗi API:", response.status, errorText);
+//         throw new Error(errorText || "Lỗi khi thêm sản phẩm");
+//       }
+
+//       const newProduct = await response.json();
+//       console.log("✅ Sản phẩm đã thêm thành công:", newProduct);
+
+//       // Cập nhật danh sách sản phẩm sau khi thêm
+//       dispatch(fetchProducts());
+//       return newProduct;
+//     } catch (error) {
+//       console.error("⚠️ Lỗi addProduct:", error.message);
+//       return rejectWithValue(error.message);
+//     }
+//   }
+// );
+
+
+
+// // Cập nhật sản phẩm
+// export const updateProduct = createAsyncThunk(
+//   "products/updateProduct",
+//   async (product, { dispatch, rejectWithValue }) => {
+//     try {
+//       const response = await fetch(`https://localhost:7163/api/Product/${product.productId}`, {
+//         method: "PUT",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify({
+//           name: product.name,
+//           price: product.price,
+//           stock: product.stock,
+//           imageUrl: product.imageUrl,
+//           categoryId: product.categoryId,
+//         }),
+//       });
+
+//       if (!response.ok) throw new Error("Lỗi khi cập nhật sản phẩm!");
+
+//       const updatedProduct = await response.json();
+//       dispatch(fetchProducts()); // Load lại danh sách sản phẩm
+//       return updatedProduct;
+//     } catch (error) {
+//       console.error("Lỗi updateProduct:", error);
+//       return rejectWithValue(error.message);
+//     }
+//   }
+// );
+
+
+
+// const productsSlice = createSlice({
+//   name: "products",
+//   initialState: { items: [], status: "idle", error: null },
+//   reducers: {},
+//   extraReducers: (builder) => {
+//     builder
+//       .addCase(fetchProducts.fulfilled, (state, action) => {
+//         state.items = action.payload;
+//         state.status = "succeeded";
+//       })
+//       .addCase(deleteProduct.fulfilled, (state, action) => {
+//         state.items = state.items.filter((item) => item.productId !== action.payload);
+//       })
+      
+//       .addCase(addProduct.fulfilled, (state, action) => {
+//         state.items.push(action.payload); // Thêm sản phẩm mới vào danh sách
+//       })
+//       .addCase(addProduct.rejected, (state, action) => {
+//         state.error = action.payload || "Lỗi khi thêm sản phẩm";
+//       })
+      
+//       .addCase(updateProduct.fulfilled, (state, action) => {
+//         console.log("Dữ liệu trả về từ API:", action.payload);
+    
+//         const index = state.items.findIndex((item) => item.productId === action.payload.productId);
+//         if (index !== -1) {
+//             state.items[index] = action.payload;
+//         } else {
+//             console.warn("Không tìm thấy sản phẩm cần cập nhật!");
+//         }
+//     })
+    
+//       .addMatcher((action) => action.type.endsWith("/pending"), (state) => {
+//         state.status = "loading";
+//       })
+//       .addMatcher((action) => action.type.endsWith("/rejected"), (state, action) => {
+//         state.status = "failed";
+//         state.error = action.error.message;
+//       });
+//   },
+// });
+
+// export default productsSlice.reducer;
+
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 const API_URL = "https://localhost:7163/api/Product"; 
 
 export const fetchProducts = createAsyncThunk("products/fetchProducts", async () => {
   try {
-    const response = await fetch("https://localhost:7163/api/Product");
+    const response = await fetch(API_URL);
 
     if (!response.ok) throw new Error("Lỗi khi lấy dữ liệu sản phẩm!");
 
     const data = await response.json();
     console.log("API Product Response:", data);
 
-    // Kiểm tra chính xác xem `data` chứa danh sách sản phẩm ở đâu
     if (Array.isArray(data?.data)) return data.data;
     if (Array.isArray(data?.data?.$values)) return data.data.$values;
     
@@ -610,20 +777,17 @@ export const fetchProducts = createAsyncThunk("products/fetchProducts", async ()
   }
 });
 
-//xoá sản phẩm
+// Xóa sản phẩm
 export const deleteProduct = createAsyncThunk(
   "products/deleteProduct",
   async (productId, { rejectWithValue }) => {
     try {
-      const response = await fetch(`https://localhost:7163/api/Product/${productId}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(`${API_URL}/${productId}`, { method: "DELETE" });
 
       if (!response.ok) throw new Error("Lỗi khi xóa sản phẩm!");
 
       console.log(`Sản phẩm ${productId} đã bị xóa thành công.`);
-
-      return productId; // Trả về ID để cập nhật Redux state
+      return productId;
     } catch (error) {
       console.error("Lỗi deleteProduct:", error);
       return rejectWithValue(error.message);
@@ -632,36 +796,6 @@ export const deleteProduct = createAsyncThunk(
 );
 
 // Thêm sản phẩm mới
-// export const addProduct = createAsyncThunk(
-//   "products/addProduct",
-//   async (product, { dispatch, rejectWithValue }) => {
-//     try {
-//       if (!product.categoryId) {
-//         return rejectWithValue("Danh mục sản phẩm là bắt buộc!");
-//       }
-
-//       const response = await fetch(`${"https://localhost:7163/api/Product"}`, {
-//         method: "POST",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify(product),
-//       });
-
-//       if (!response.ok) {
-//         const errorText = await response.text(); // Lấy lỗi chi tiết
-//         console.error("Lỗi API:", errorText);
-//         throw new Error(errorText || "Lỗi khi thêm sản phẩm");
-//       }
-
-//       const newProduct = await response.json();
-//       dispatch(fetchProducts());
-//       return newProduct;
-//     } catch (error) {
-//       console.error("Lỗi addProduct:", error.message);
-//       return rejectWithValue(error.message);
-//     }
-//   }
-// );
-
 export const addProduct = createAsyncThunk(
   "products/addProduct",
   async (product, { dispatch, rejectWithValue }) => {
@@ -670,35 +804,32 @@ export const addProduct = createAsyncThunk(
         return rejectWithValue("Danh mục sản phẩm là bắt buộc!");
       }
 
-      // Kiểm tra dữ liệu trước khi gửi lên API
       const newProductData = {
         name: product.name,
         price: product.price,
         stock: product.stock,
         imageUrl: product.imageUrl,
         categoryId: product.categoryId,
-        isDelete: false, // Đảm bảo sản phẩm mới không bị xóa
+        isDelete: false,
       };
 
       console.log("📤 Dữ liệu gửi lên API:", newProductData);
 
-      const response = await fetch("https://localhost:7163/api/Product", {
+      const response = await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newProductData),
       });
 
       if (!response.ok) {
-        const errorText = await response.text(); // Lấy lỗi chi tiết
-        console.error("❌ Lỗi API:", response.status, errorText);
+        const errorText = await response.text();
         throw new Error(errorText || "Lỗi khi thêm sản phẩm");
       }
 
       const newProduct = await response.json();
       console.log("✅ Sản phẩm đã thêm thành công:", newProduct);
 
-      // Cập nhật danh sách sản phẩm sau khi thêm
-      dispatch(fetchProducts());
+      dispatch(fetchProducts()); // Load lại danh sách sản phẩm
       return newProduct;
     } catch (error) {
       console.error("⚠️ Lỗi addProduct:", error.message);
@@ -707,34 +838,12 @@ export const addProduct = createAsyncThunk(
   }
 );
 
-
-
-
 // Cập nhật sản phẩm
-// export const updateProduct = createAsyncThunk("products/updateProduct", async (product, { dispatch }) => {
-//   try {
-//     const response = await fetch(`${API_URL}/${product.productId}`, {
-//       method: "PUT",
-//       headers: { "Content-Type": "application/json" },
-//       body: JSON.stringify(product),
-//     });
-
-//     if (!response.ok) throw new Error("Lỗi khi cập nhật sản phẩm");
-
-//     const updatedProduct = await response.json();
-//     dispatch(fetchProducts()); // Cập nhật lại danh sách
-//     return updatedProduct;
-//   } catch (error) {
-//     console.error("Lỗi updateProduct:", error);
-//     throw error;
-//   }
-// });
-
 export const updateProduct = createAsyncThunk(
   "products/updateProduct",
   async (product, { dispatch, rejectWithValue }) => {
     try {
-      const response = await fetch(`https://localhost:7163/api/Product/${product.productId}`, {
+      const response = await fetch(`${API_URL}/${product.productId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -758,8 +867,6 @@ export const updateProduct = createAsyncThunk(
   }
 );
 
-
-
 const productsSlice = createSlice({
   name: "products",
   initialState: { items: [], status: "idle", error: null },
@@ -773,25 +880,21 @@ const productsSlice = createSlice({
       .addCase(deleteProduct.fulfilled, (state, action) => {
         state.items = state.items.filter((item) => item.productId !== action.payload);
       })
-      
       .addCase(addProduct.fulfilled, (state, action) => {
-        state.items.push(action.payload); // Thêm sản phẩm mới vào danh sách
+        state.items.push(action.payload);
       })
       .addCase(addProduct.rejected, (state, action) => {
         state.error = action.payload || "Lỗi khi thêm sản phẩm";
       })
-      
       .addCase(updateProduct.fulfilled, (state, action) => {
         console.log("Dữ liệu trả về từ API:", action.payload);
-    
         const index = state.items.findIndex((item) => item.productId === action.payload.productId);
         if (index !== -1) {
-            state.items[index] = action.payload;
+          state.items[index] = action.payload;
         } else {
-            console.warn("Không tìm thấy sản phẩm cần cập nhật!");
+          console.warn("Không tìm thấy sản phẩm cần cập nhật!");
         }
-    })
-    
+      })
       .addMatcher((action) => action.type.endsWith("/pending"), (state) => {
         state.status = "loading";
       })

@@ -1,19 +1,25 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const OrderTracking = () => {
-  const order = useSelector((state) => state.order);
+  const [order, setOrder] = useState(null);
   const navigate = useNavigate();
 
-  if (!order.status || !order.orderDetails) {
+  useEffect(() => {
+    const savedOrder = localStorage.getItem("latestOrder");
+    if (savedOrder) {
+      setOrder(JSON.parse(savedOrder));
+    }
+  }, []);
+
+  if (!order) {
     return (
-      <div className="max-w-3xl mx-auto py-10 px-6 text-center">
-        <h2 className="text-3xl font-bold mb-4 text-gray-700">🚫 Không tìm thấy đơn hàng</h2>
-        <p className="text-lg text-gray-600 mb-6">Vui lòng kiểm tra lại hoặc đặt hàng mới.</p>
+      <div className="text-center py-10">
+        <h2 className="text-2xl font-bold text-red-500">🚫 Không tìm thấy đơn hàng</h2>
+        <p className="text-gray-600 mt-2">Vui lòng kiểm tra lại hoặc đặt hàng mới.</p>
         <button
-          onClick={() => navigate('/')}
-          className="bg-blue-600 text-white py-2 px-6 rounded-lg hover:bg-blue-700 transition shadow-md"
+          onClick={() => navigate("/")}
+          className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
         >
           🏠 Về trang chủ
         </button>
@@ -22,13 +28,19 @@ const OrderTracking = () => {
   }
 
   return (
-    <div className="max-w-3xl mx-auto py-10 px-6 text-center">
-      <h2 className="text-3xl font-bold mb-4 text-green-600">📦 Theo dõi đơn hàng</h2>
-      <p className="text-lg text-gray-700 mb-4">Mã đơn hàng: <strong>{order.orderDetails.id}</strong></p>
-      <p className="text-md text-gray-600 mb-6">Tình trạng: <span className="font-semibold">{order.orderDetails.status}</span></p>
+    <div className="max-w-2xl mx-auto py-8">
+      <h2 className="text-2xl font-bold text-center mb-6">📦 Chi tiết đơn hàng</h2>
+      <div className="border p-4 rounded shadow">
+        <p><strong>Mã đơn hàng:</strong> {order.id}</p>
+        <p><strong>Họ tên:</strong> {order.name}</p>
+        <p><strong>Địa chỉ:</strong> {order.address}</p>
+        <p><strong>Số điện thoại:</strong> {order.phone}</p>
+        {/* <p><strong>Tổng tiền:</strong> {order.totalPrice} VND</p> */}
+        <p><strong>Trạng thái:</strong> {order.status}</p>
+      </div>
       <button
-        onClick={() => navigate('/')}
-        className="bg-blue-600 text-white py-2 px-6 rounded-lg hover:bg-blue-700 transition shadow-md"
+        onClick={() => navigate("/")}
+        className="mt-6 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition block mx-auto"
       >
         🏠 Về trang chủ
       </button>
