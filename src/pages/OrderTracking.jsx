@@ -35,7 +35,7 @@ const OrderTracking = () => {
         <p><strong>Họ tên:</strong> {order.name}</p>
         <p><strong>Địa chỉ:</strong> {order.address}</p>
         <p><strong>Số điện thoại:</strong> {order.phone}</p>
-        {/* <p><strong>Tổng tiền:</strong> {order.totalPrice} VND</p> */}
+        <p><strong>Tổng tiền:</strong> {order.totalPrice.toLocaleString()} VND</p>
         <p><strong>Trạng thái:</strong> {order.status}</p>
       </div>
       <button
