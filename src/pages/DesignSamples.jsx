@@ -366,6 +366,148 @@
 
 // export default DesignSamples;
 
+// import React, { useState, useEffect } from "react";
+// import { useDispatch, useSelector } from "react-redux";
+// import { fetchProducts } from "../redux/slices/productsSlice";
+// import { addToCart as addToCartAction } from "../redux/slices/cartSlice";
+
+// const DesignSamples = () => {
+//   const dispatch = useDispatch();
+//   const [openFilter, setOpenFilter] = useState(null);
+//   const [selectedFilters, setSelectedFilters] = useState({});
+//   const [searchTerm, setSearchTerm] = useState("");
+
+//   // Lấy danh sách sản phẩm từ Redux
+//   const products = useSelector((state) => state.products.items);
+  
+//   useEffect(() => {
+//     dispatch(fetchProducts());
+//   }, [dispatch]);
+
+//   const toggleFilter = (filter) => {
+//     setOpenFilter(openFilter === filter ? null : filter);
+//   };
+
+//   const toggleOption = (option) => {
+//     setSelectedFilters((prev) => ({
+//       ...prev,
+//       [option]: !prev[option],
+//     }));
+//   };
+
+//   // ✅ Mọi người đều có thể thêm vào giỏ hàng
+//   // const addToCart = (product) => {
+//   //   console.log("✅ Thêm vào giỏ hàng:", product);
+//   //   dispatch(addToCartAction(product));
+//   //   alert("🛒 Đã thêm vào giỏ hàng!");
+//   // };
+//   const addToCart = (product) => {
+//     console.log("🔍 Sản phẩm được bấm:", product); // Kiểm tra xem có vào đây không
+  
+//     if (!product) {
+//       console.error("❌ Sản phẩm không hợp lệ!");
+//       return;
+//     }
+  
+//     dispatch(addToCartAction(product));
+//     console.log("✅ Đã dispatch action addToCart!");
+//   };
+  
+
+//   const filters = [
+//     { name: "PHÂN LOẠI", options: ["Áo Sơ Mi", "Áo Thun"] },
+//     { name: "LOẠI SẢN PHẨM", options: ["Áo Sơ Mi", "Áo Thun"] },
+//   ];
+
+//   // Lọc sản phẩm theo từ khóa tìm kiếm & bộ lọc danh mục
+//   const filteredProducts = products.filter((product) => {
+//     const matchesSearch = product.productName.toLowerCase().includes(searchTerm.toLowerCase());
+
+//     // Nếu không có bộ lọc nào được chọn → hiển thị tất cả
+//     if (Object.keys(selectedFilters).length === 0) return matchesSearch;
+
+//     const matchesFilter = Object.keys(selectedFilters).some(filter => selectedFilters[filter] && product.categoryId === filter);
+//     return matchesSearch && matchesFilter;
+//   });
+
+//   return (
+//     <div className="bg-[#0f0f0f] min-h-screen text-white p-4">
+//       <div className="max-w-7xl mx-auto grid grid-cols-5 gap-6">
+//         <div className="col-span-1">
+//           <input
+//             type="text"
+//             placeholder="Tìm kiếm thiết kế..."
+//             value={searchTerm}
+//             onChange={(e) => setSearchTerm(e.target.value)}
+//             className="w-full p-2 mb-4 rounded-md text-black focus:outline-none"
+//           />
+//           {filters.map((filter, index) => (
+//             <div key={index} className="mb-4">
+//               <button 
+//                 className="w-full text-left bg-[#1f1f1f] p-2 rounded-md mb-2 hover:bg-[#333] transition-colors" 
+//                 onClick={() => toggleFilter(filter.name)}
+//               >
+//                 {filter.name} {openFilter === filter.name ? "-" : "+"}
+//               </button>
+//               {openFilter === filter.name && (
+//                 <ul className="pl-4">
+//                   {filter.options.map((option, i) => (
+//                     <li key={i} className="py-1 flex items-center">
+//                       <input 
+//                         type="checkbox" 
+//                         checked={selectedFilters[option] || false} 
+//                         onChange={() => toggleOption(option)} 
+//                         className="mr-2"
+//                       />
+//                       {option}
+//                     </li>
+//                   ))}
+//                 </ul>
+//               )}
+//             </div>
+//           ))}
+//         </div>
+
+//         {/* Hiển thị danh sách sản phẩm */}
+//         <div className="col-span-4 grid grid-cols-3 gap-6">
+//           {filteredProducts.length > 0 ? (
+//             filteredProducts.map((product) => (
+//               <div
+//                 key={product.productId}
+//                 className="bg-[#1f1f1f] p-4 rounded-md shadow-md hover:scale-105 transition-transform"
+//               >
+//                 <img
+//                   src={product.image ? `https://localhost:7163/uploads/${product.image.split("\\").pop()}` : "/placeholder.png"}
+//                   alt={product.productName}
+//                   className="w-full h-60 object-cover rounded-md mb-2 hover:opacity-80 transition-opacity"
+//                 />
+
+//                 {/* <img
+//                   src={product.image ? product.image.replace(/\\/g, "/") : "/placeholder.png"}
+//                   alt={product.productName}
+//                   className="w-full h-60 object-cover rounded-md mb-2 hover:opacity-80 transition-opacity"
+//                 /> */}
+//                 <h3 className="text-center text-xl mb-2">{product.productName}</h3>
+//                 <p className="text-center text-lg font-semibold mb-2">{product.price.toLocaleString()} VND</p>
+//                 <button 
+//                   className="w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-700 transition-colors" 
+//                   onClick={() => addToCart(product)}
+//                 >
+//                   🛒 Thêm vào giỏ hàng
+//                 </button>
+//               </div>
+//             ))
+//           ) : (
+//             <p className="col-span-3 text-center text-gray-400">Không tìm thấy sản phẩm nào</p>
+//           )}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default DesignSamples;
+
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProducts } from "../redux/slices/productsSlice";
@@ -374,12 +516,12 @@ import { addToCart as addToCartAction } from "../redux/slices/cartSlice";
 const DesignSamples = () => {
   const dispatch = useDispatch();
   const [openFilter, setOpenFilter] = useState(null);
-  const [selectedFilters, setSelectedFilters] = useState({});
+  const [selectedFilters, setSelectedFilters] = useState(new Set());
   const [searchTerm, setSearchTerm] = useState("");
 
   // Lấy danh sách sản phẩm từ Redux
   const products = useSelector((state) => state.products.items);
-  
+
   useEffect(() => {
     dispatch(fetchProducts());
   }, [dispatch]);
@@ -389,45 +531,29 @@ const DesignSamples = () => {
   };
 
   const toggleOption = (option) => {
-    setSelectedFilters((prev) => ({
-      ...prev,
-      [option]: !prev[option],
-    }));
+    setSelectedFilters((prevFilters) => {
+      const newFilters = new Set(prevFilters);
+      if (newFilters.has(option)) {
+        newFilters.delete(option);
+      } else {
+        newFilters.add(option);
+      }
+      return newFilters;
+    });
   };
-
-  // ✅ Mọi người đều có thể thêm vào giỏ hàng
-  // const addToCart = (product) => {
-  //   console.log("✅ Thêm vào giỏ hàng:", product);
-  //   dispatch(addToCartAction(product));
-  //   alert("🛒 Đã thêm vào giỏ hàng!");
-  // };
-  const addToCart = (product) => {
-    console.log("🔍 Sản phẩm được bấm:", product); // Kiểm tra xem có vào đây không
-  
-    if (!product) {
-      console.error("❌ Sản phẩm không hợp lệ!");
-      return;
-    }
-  
-    dispatch(addToCartAction(product));
-    console.log("✅ Đã dispatch action addToCart!");
-  };
-  
 
   const filters = [
     { name: "PHÂN LOẠI", options: ["Áo Sơ Mi", "Áo Thun"] },
     { name: "LOẠI SẢN PHẨM", options: ["Áo Sơ Mi", "Áo Thun"] },
   ];
 
-  // Lọc sản phẩm theo từ khóa tìm kiếm & bộ lọc danh mục
+  // Lọc sản phẩm theo từ khóa tìm kiếm & danh mục đã chọn
   const filteredProducts = products.filter((product) => {
     const matchesSearch = product.productName.toLowerCase().includes(searchTerm.toLowerCase());
 
-    // Nếu không có bộ lọc nào được chọn → hiển thị tất cả
-    if (Object.keys(selectedFilters).length === 0) return matchesSearch;
+    if (selectedFilters.size === 0) return matchesSearch;
 
-    const matchesFilter = Object.keys(selectedFilters).some(filter => selectedFilters[filter] && product.categoryId === filter);
-    return matchesSearch && matchesFilter;
+    return matchesSearch && selectedFilters.has(product.categoryId);
   });
 
   return (
@@ -455,7 +581,7 @@ const DesignSamples = () => {
                     <li key={i} className="py-1 flex items-center">
                       <input 
                         type="checkbox" 
-                        checked={selectedFilters[option] || false} 
+                        checked={selectedFilters.has(option)}
                         onChange={() => toggleOption(option)} 
                         className="mr-2"
                       />
@@ -481,17 +607,11 @@ const DesignSamples = () => {
                   alt={product.productName}
                   className="w-full h-60 object-cover rounded-md mb-2 hover:opacity-80 transition-opacity"
                 />
-
-                {/* <img
-                  src={product.image ? product.image.replace(/\\/g, "/") : "/placeholder.png"}
-                  alt={product.productName}
-                  className="w-full h-60 object-cover rounded-md mb-2 hover:opacity-80 transition-opacity"
-                /> */}
                 <h3 className="text-center text-xl mb-2">{product.productName}</h3>
                 <p className="text-center text-lg font-semibold mb-2">{product.price.toLocaleString()} VND</p>
                 <button 
                   className="w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-700 transition-colors" 
-                  onClick={() => addToCart(product)}
+                  onClick={() => dispatch(addToCartAction(product))}
                 >
                   🛒 Thêm vào giỏ hàng
                 </button>
