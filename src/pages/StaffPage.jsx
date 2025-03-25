@@ -717,13 +717,11 @@ const StaffPage = () => {
     // const handleDelete = (id) => {
     //      dispatch(deleteProduct(id));
     // };
-    const handleDelete = (id) => {
-        dispatch(deleteProduct(id));
-        dispatch({
-            type: "products/removeProduct",
-            payload: id
-        });
-    };
+    const handleDelete = async (id) => {
+        await dispatch(deleteProduct(id));
+        dispatch(fetchProducts()); // Load lại danh sách sau khi xóa
+      };
+      
     
 
     const openEditModal = (product) => {
