@@ -40,7 +40,7 @@
 
 //     // Nếu đang tải dữ liệu từ API
 //     if (status === "loading") return <p>Loading...</p>;
-    
+
 //     // Nếu API bị lỗi
 //     if (status === "failed") return <p>Error: {error || "Không thể lấy dữ liệu sản phẩm"}</p>;
 
@@ -532,18 +532,18 @@
 //     useEffect(() => {
 //         dispatch(fetchProducts());
 //     }, [dispatch]);
-    
+
 //     const handleDelete = async (id) => {
 //         dispatch(deleteProduct(id));
 //     };
-    
+
 
 //     const handleEdit = (product) => {
 //         if (!product) {
 //             console.error("Lỗi: Không có sản phẩm nào để chỉnh sửa.");
 //             return;
 //         }
-    
+
 //         // Đảm bảo product có đầy đủ thuộc tính cần thiết
 //         const formattedProduct = {
 //             productId: product.productId || "",
@@ -555,7 +555,7 @@
 //             description: product.description || "",
 //             isDeleted: product.isDeleted ?? false,
 //         };
-    
+
 //         setEditingProduct(formattedProduct);
 //         setModalOpen(true);
 //         // setEditingProduct(product);
@@ -567,7 +567,7 @@
 //         setEditingProduct(null);
 //         setModalOpen(true);
 //     };
-      
+
 
 //     const handleSave = () => {
 //         if (editingProduct && editingProduct.productId) {
@@ -697,6 +697,7 @@ const StaffPage = () => {
     const dispatch = useDispatch();
     const { items } = useSelector((state) => state.products);
     const userRole = useSelector((state) => state.auth?.user?.role || "guest");
+    const [categories, setCategories] = useState([]);
 
     const products = Array.isArray(items) ? items : [];
 
@@ -707,22 +708,35 @@ const StaffPage = () => {
         price: "",
         stockInStorage: "",
         image: "",
-        description: ""
+        description: "",
+        categoryId: 1
     });
+
+    // Fetch categories từ API
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const response = await fetch('https://phamdangtuc-001-site1.ntempurl.com/api/Category');
+                const data = await response.json();
+                if (data.status === 1 && data.data.$values) {
+                    setCategories(data.data.$values);
+                }
+            } catch (error) {
+                console.error('Error fetching categories:', error);
+            }
+        };
+
+        fetchCategories();
+    }, []);
 
     useEffect(() => {
         dispatch(fetchProducts());
     }, [dispatch]);
-    
-    // const handleDelete = (id) => {
-    //      dispatch(deleteProduct(id));
-    // };
+
     const handleDelete = async (id) => {
         await dispatch(deleteProduct(id));
-        dispatch(fetchProducts()); // Load lại danh sách sau khi xóa
-      };
-      
-    
+        dispatch(fetchProducts());
+    };
 
     const openEditModal = (product) => {
         setEditingProduct({ ...product });
@@ -731,6 +745,14 @@ const StaffPage = () => {
 
     const openAddModal = () => {
         setEditingProduct(null);
+        setNewProduct({
+            productName: "",
+            price: "",
+            stockInStorage: "",
+            image: "",
+            description: "",
+            categoryId: categories[0]?.categoryId || 1
+        });
         setModalOpen(true);
     };
 
@@ -758,6 +780,7 @@ const StaffPage = () => {
                         <th>Tồn kho</th>
                         <th>Hình ảnh</th>
                         <th>Mô tả</th>
+                        <th>Danh mục</th>
                         {userRole !== "staff" && <th>Hành động</th>}
                     </tr>
                 </thead>
@@ -771,15 +794,15 @@ const StaffPage = () => {
                                 <td>{product.stockInStorage}</td>
                                 <td>
                                     <img
-                                    src={product.image?.startsWith("http") ? product.image : `https://localhost:7163/uploads/${product.image?.split("\\").pop()}`}
-
-                                        // src={`https://localhost:7163/uploads/${product.image?.split("\\").pop()}`}
+                                        src={product.image?.startsWith("http") ? product.image : `https://localhost:7163/uploads/${product.image?.split("\\").pop()}`}
                                         alt={product.productName}
-
                                         className="product-image"
                                     />
                                 </td>
                                 <td>{product.description}</td>
+                                <td>
+                                    {categories.find(cat => cat.categoryId === product.categoryId)?.categoryName || 'Chưa phân loại'}
+                                </td>
                                 {userRole !== "staff" && (
                                     <td>
                                         <button onClick={() => openEditModal(product)} className="edit-btn">Sửa</button>
@@ -790,7 +813,7 @@ const StaffPage = () => {
                         ))
                     ) : (
                         <tr>
-                            <td colSpan="7">Không có sản phẩm nào</td>
+                            <td colSpan="8">Không có sản phẩm nào</td>
                         </tr>
                     )}
                 </tbody>
@@ -859,8 +882,30 @@ const StaffPage = () => {
                                 }
                             />
                         </label>
-                        <button className="save-btn" onClick={handleSave}>Lưu</button>
-                        <button className="close-btn" onClick={() => setModalOpen(false)}>Đóng</button>
+                        <label>
+                            Danh mục:
+                            <select
+                                value={editingProduct ? editingProduct.categoryId : newProduct.categoryId}
+                                onChange={(e) =>
+                                    editingProduct
+                                        ? setEditingProduct({ ...editingProduct, categoryId: Number(e.target.value) })
+                                        : setNewProduct({ ...newProduct, categoryId: Number(e.target.value) })
+                                }
+                            >
+                                {categories.map((category) => (
+                                    <option key={category.categoryId} value={category.categoryId}>
+                                        {category.categoryName}
+                                    </option>
+                                ))}
+                            </select>
+                        </label>
+                        <div className="button-container">
+                            <button className="save-btn" onClick={handleSave}>Lưu</button>
+                            <div className="close-btn-container">
+                                <button className="close-btn" onClick={() => setModalOpen(false)}>Đóng</button>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             )}

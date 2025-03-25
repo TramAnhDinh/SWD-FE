@@ -518,9 +518,27 @@ const DesignSamples = () => {
   const [openFilter, setOpenFilter] = useState(null);
   const [selectedFilters, setSelectedFilters] = useState(new Set());
   const [searchTerm, setSearchTerm] = useState("");
+  const [categories, setCategories] = useState([]);
 
   // Lấy danh sách sản phẩm từ Redux
   const products = useSelector((state) => state.products.items);
+
+  // Fetch categories từ API
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch('https://phamdangtuc-001-site1.ntempurl.com/api/Category');
+        const data = await response.json();
+        if (data.status === 1 && data.data.$values) {
+          setCategories(data.data.$values);
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   useEffect(() => {
     dispatch(fetchProducts());
@@ -530,22 +548,17 @@ const DesignSamples = () => {
     setOpenFilter(openFilter === filter ? null : filter);
   };
 
-  const toggleOption = (option) => {
+  const toggleOption = (categoryId) => {
     setSelectedFilters((prevFilters) => {
       const newFilters = new Set(prevFilters);
-      if (newFilters.has(option)) {
-        newFilters.delete(option);
+      if (newFilters.has(categoryId)) {
+        newFilters.delete(categoryId);
       } else {
-        newFilters.add(option);
+        newFilters.add(categoryId);
       }
       return newFilters;
     });
   };
-
-  const filters = [
-    { name: "PHÂN LOẠI", options: ["Áo Sơ Mi", "Áo Thun"] },
-    { name: "LOẠI SẢN PHẨM", options: ["Áo Sơ Mi", "Áo Thun"] },
-  ];
 
   // Lọc sản phẩm theo từ khóa tìm kiếm & danh mục đã chọn
   const filteredProducts = products.filter((product) => {
@@ -567,31 +580,29 @@ const DesignSamples = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full p-2 mb-4 rounded-md text-black focus:outline-none"
           />
-          {filters.map((filter, index) => (
-            <div key={index} className="mb-4">
-              <button 
-                className="w-full text-left bg-[#1f1f1f] p-2 rounded-md mb-2 hover:bg-[#333] transition-colors" 
-                onClick={() => toggleFilter(filter.name)}
-              >
-                {filter.name} {openFilter === filter.name ? "-" : "+"}
-              </button>
-              {openFilter === filter.name && (
-                <ul className="pl-4">
-                  {filter.options.map((option, i) => (
-                    <li key={i} className="py-1 flex items-center">
-                      <input 
-                        type="checkbox" 
-                        checked={selectedFilters.has(option)}
-                        onChange={() => toggleOption(option)} 
-                        className="mr-2"
-                      />
-                      {option}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          ))}
+          <div className="mb-4">
+            <button 
+              className="w-full text-left bg-[#1f1f1f] p-2 rounded-md mb-2 hover:bg-[#333] transition-colors" 
+              onClick={() => toggleFilter("categories")}
+            >
+              DANH MỤC {openFilter === "categories" ? "-" : "+"}
+            </button>
+            {openFilter === "categories" && (
+              <ul className="pl-4">
+                {categories.map((category) => (
+                  <li key={category.categoryId} className="py-1 flex items-center">
+                    <input 
+                      type="checkbox" 
+                      checked={selectedFilters.has(category.categoryId)}
+                      onChange={() => toggleOption(category.categoryId)} 
+                      className="mr-2"
+                    />
+                    {category.categoryName}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </div>
 
         {/* Hiển thị danh sách sản phẩm */}

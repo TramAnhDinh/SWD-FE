@@ -38,10 +38,14 @@ import ProfilePage from './pages/ProfilePage';
 
 // Component bảo vệ route dựa trên role
 const ProtectedRoute = ({ children, allowedRoles }) => {
-  const user = useSelector((state) => state.user.user);
+  const { user, role } = useSelector((state) => state.user);
   
   if (!user) return <Navigate to="/login" replace />;
-  if (!allowedRoles.includes(user.roleId)) return <Navigate to="/" replace />;
+  
+  // Chuyển đổi role string thành roleId tương ứng
+  const roleId = role === "staff" ? 2 : role === "member" ? 3 : 1;
+  
+  if (!allowedRoles.includes(roleId)) return <Navigate to="/" replace />;
   
   return children;
 };
@@ -59,15 +63,10 @@ const AppContent = () => {
       {/* {location.pathname === '/' && <NewProductCarousel />} */}
       <main className="min-h-screen bg-gray-50">
         <Routes>
+          {/* Public routes */}
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/product/:id" element={<ProductDetail />} />
-          <Route path="/design/custom" element={<DesignerPage />} />
-          <Route path="/design/mau-co-san" element={<DesignSamples />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/checkout-confirmation" element={<CheckoutConfirmation />} />
           <Route path="/lien-he" element={<ContactPage />} />
           <Route path="/design/bang-gia-dong-phuc" element={<PricingTable />} />
           <Route path="/design/bang-gia-ao-lop" element={<PricingClass />} />
@@ -79,20 +78,23 @@ const AppContent = () => {
           <Route path="/blog/class/:id" element={<NewsDetail />} />
           <Route path="/blog/b" element={<HandPage />} />
           <Route path="/blog/b/:id" element={<HandDetail />} />
-          <Route path="/order-status" element={<OrderStatus />} />
-          <Route path="/order-tracking" element={<OrderTracking />} />
-          <Route path="/staff" element={<StaffPage />} />
-          <Route path="/member" element={<MemberPage />} />
 
-           {/* Phân quyền role */}
+          {/* Protected routes for Staff (roleId = 2) */}
           <Route path="/staff" element={<ProtectedRoute allowedRoles={[2]}><StaffPage /></ProtectedRoute>} />
+          <Route path="/order-tracking" element={<ProtectedRoute allowedRoles={[2]}><OrderTracking /></ProtectedRoute>} />
+
+          {/* Protected routes for Member (roleId = 3) */}
           <Route path="/member" element={<ProtectedRoute allowedRoles={[3]}><MemberPage /></ProtectedRoute>} />
+          <Route path="/cart" element={<ProtectedRoute allowedRoles={[3]}><Cart /></ProtectedRoute>} />
+          <Route path="/product/:id" element={<ProtectedRoute allowedRoles={[3]}><ProductDetail /></ProtectedRoute>} />
+          <Route path="/design/custom" element={<ProtectedRoute allowedRoles={[3]}><DesignerPage /></ProtectedRoute>} />
+          <Route path="/design/mau-co-san" element={<ProtectedRoute allowedRoles={[3]}><DesignSamples /></ProtectedRoute>} />
+          <Route path="/checkout" element={<ProtectedRoute allowedRoles={[3]}><Checkout /></ProtectedRoute>} />
+          <Route path="/checkout-confirmation" element={<ProtectedRoute allowedRoles={[3]}><CheckoutConfirmation /></ProtectedRoute>} />
+          <Route path="/order-status" element={<ProtectedRoute allowedRoles={[3]}><OrderStatus /></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute allowedRoles={[3]}><ProfilePage /></ProtectedRoute>} />
 
-
-           {/* Trang cá nhân (cho tất cả user đã login) */}
-          <Route path="/profile" element={<ProtectedRoute allowedRoles={[2, 3]}><ProfilePage /></ProtectedRoute>} />
-
-          {/* Nếu nhập sai đường dẫn, quay về trang chủ */}
+          {/* Fallback route */}
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </main>

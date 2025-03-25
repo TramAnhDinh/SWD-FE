@@ -290,7 +290,12 @@ const Header = () => {
 
       {/* Menu trên PC */}
       <nav className="hidden md:flex gap-6 items-center">
-        {role !== "staff" && (
+        {role === "staff" ? (
+          <>
+            <Link to="/staff" className="hover:text-orange-400 text-xl">TRANG NHÂN VIÊN</Link>
+            <Link to="/order-tracking" className="hover:text-orange-400 text-xl">THEO DÕI ĐƠN HÀNG</Link>
+          </>
+        ) : (
           <>
             <Link to="/" className="hover:text-orange-400 text-xl">TRANG CHỦ</Link>
 
@@ -304,30 +309,29 @@ const Header = () => {
                 <Link to="/design/mau-co-san" className="block px-4 py-2 hover:bg-gray-800">MẪU CÓ SẴN</Link>
               </div>
             </div>
-            {/* Dropdown Thiết kế áo trên PC */}
-        <div className="relative group">
-          <button className="hover:text-orange-400 text-xl flex items-center">
-          ĐỒNG PHỤC <ChevronDown className="ml-2" />
-          </button>
-          <div className="absolute left-0   top-full max-w-64 w-56 bg-black border border-gray-700 rounded-lg  hidden group-hover:block z-50">
-            <Link to="/design/bang-gia-dong-phuc" className="block px-4 py-2 hover:bg-gray-800 ">BẢNG GIÁ ĐỒNG PHỤC</Link>
-            <Link to="/design/bang-gia-ao-lop" className="block px-4 py-2 hover:bg-gray-800">BẢNG GIÁ ÁO LỚP</Link>
-            <Link to="/design/bang-gia-phu-kien" className="block px-4 py-2 hover:bg-gray-800">BẢNG GIÁ PHỤ KIỆN</Link>
-            <Link to="/design/bang-gia-dich-vu" className="block px-4 py-2 hover:bg-gray-800">BẢNG GIÁ DỊCH VỤ</Link>
-          
-          </div>
-        </div>
 
-        <div className="relative group">
-          <button className="hover:text-orange-400 text-xl flex items-center">
-          BLOG <ChevronDown className="ml-2" />
-          </button>
-          <div className="absolute left-0   top-full max-w-64 w-56 bg-black border border-gray-700 rounded-lg  hidden group-hover:block z-50">
-            <Link to="/blog" className="block px-4 py-2 hover:bg-gray-800 ">THÔNG TIN</Link>
-            <Link to="/blog/class" className="block px-4 py-2 hover:bg-gray-800">ÁO LỚP</Link>
-            <Link to="/blog/b" className="block px-4 py-2 hover:bg-gray-800">CẨM NANG</Link>
-          </div>
-        </div>
+            <div className="relative group">
+              <button className="hover:text-orange-400 text-xl flex items-center">
+                ĐỒNG PHỤC <ChevronDown className="ml-2" />
+              </button>
+              <div className="absolute left-0 top-full max-w-64 w-56 bg-black border border-gray-700 rounded-lg hidden group-hover:block z-50">
+                <Link to="/design/bang-gia-dong-phuc" className="block px-4 py-2 hover:bg-gray-800">BẢNG GIÁ ĐỒNG PHỤC</Link>
+                <Link to="/design/bang-gia-ao-lop" className="block px-4 py-2 hover:bg-gray-800">BẢNG GIÁ ÁO LỚP</Link>
+                <Link to="/design/bang-gia-phu-kien" className="block px-4 py-2 hover:bg-gray-800">BẢNG GIÁ PHỤ KIỆN</Link>
+                <Link to="/design/bang-gia-dich-vu" className="block px-4 py-2 hover:bg-gray-800">BẢNG GIÁ DỊCH VỤ</Link>
+              </div>
+            </div>
+
+            <div className="relative group">
+              <button className="hover:text-orange-400 text-xl flex items-center">
+                BLOG <ChevronDown className="ml-2" />
+              </button>
+              <div className="absolute left-0 top-full max-w-64 w-56 bg-black border border-gray-700 rounded-lg hidden group-hover:block z-50">
+                <Link to="/blog" className="block px-4 py-2 hover:bg-gray-800">THÔNG TIN</Link>
+                <Link to="/blog/class" className="block px-4 py-2 hover:bg-gray-800">ÁO LỚP</Link>
+                <Link to="/blog/b" className="block px-4 py-2 hover:bg-gray-800">CẨM NANG</Link>
+              </div>
+            </div>
 
             <Link to="/lien-he" className="hover:text-orange-400 text-xl">LIÊN HỆ</Link>
             <Link to="/cart" className="hover:text-orange-400 relative">
