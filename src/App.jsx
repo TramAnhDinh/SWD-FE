@@ -68,6 +68,8 @@ const AppContent = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/lien-he" element={<ContactPage />} />
+          <Route path="/design/custom" element={<DesignerPage/>} />
+          <Route path="/design/mau-co-san" element={<DesignSamples/>}/>
           <Route path="/design/bang-gia-dong-phuc" element={<PricingTable />} />
           <Route path="/design/bang-gia-ao-lop" element={<PricingClass />} />
           <Route path="/design/bang-gia-phu-kien" element={<PricingAccessory />} />
@@ -87,8 +89,8 @@ const AppContent = () => {
           <Route path="/member" element={<ProtectedRoute allowedRoles={[3]}><MemberPage /></ProtectedRoute>} />
           <Route path="/cart" element={<ProtectedRoute allowedRoles={[3]}><Cart /></ProtectedRoute>} />
           <Route path="/product/:id" element={<ProtectedRoute allowedRoles={[3]}><ProductDetail /></ProtectedRoute>} />
-          <Route path="/design/custom" element={<ProtectedRoute allowedRoles={[3]}><DesignerPage /></ProtectedRoute>} />
-          <Route path="/design/mau-co-san" element={<ProtectedRoute allowedRoles={[3]}><DesignSamples /></ProtectedRoute>} />
+          {/* <Route path="/design/custom" element={<ProtectedRoute allowedRoles={[3]}><DesignerPage /></ProtectedRoute>} />
+          <Route path="/design/mau-co-san" element={<ProtectedRoute allowedRoles={[3]}><DesignSamples /></ProtectedRoute>} /> */}
           <Route path="/checkout" element={<ProtectedRoute allowedRoles={[3]}><Checkout /></ProtectedRoute>} />
           <Route path="/checkout-confirmation" element={<ProtectedRoute allowedRoles={[3]}><CheckoutConfirmation /></ProtectedRoute>} />
           <Route path="/order-status" element={<ProtectedRoute allowedRoles={[3]}><OrderStatus /></ProtectedRoute>} />
