@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
-const API_URL = "https://localhost:7163/api/Product";
-// const API_URL = "https://phamdangtuc-001-site1.ntempurl.com/api/Product";
+// const API_URL = "https://localhost:7163/api/Product";
+const API_URL = "https://phamdangtuc-001-site1.ntempurl.com/api/Product";
 
 // Lấy danh sách sản phẩm
 export const fetchProducts = createAsyncThunk("products/fetchProducts", async (_, { rejectWithValue }) => {

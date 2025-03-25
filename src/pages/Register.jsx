@@ -12,7 +12,7 @@ const Register = () => {
     address: '',
     phone: '',
     avatar: '1',
-    roleName: 'member'
+    roleName: ''
   });
 
   const [error, setError] = useState('');
@@ -33,7 +33,8 @@ const Register = () => {
     setError('');
 
     try {
-      const response = await fetch('https://localhost:7163/api/users', {
+      const response = await fetch('https://phamdangtuc-001-site1.ntempurl.com/api/users', {
+      // const response = await fetch('https://localhost:7163/api/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
