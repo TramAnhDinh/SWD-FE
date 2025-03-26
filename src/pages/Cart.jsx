@@ -43,6 +43,30 @@ const Cart = () => {
     dispatch(updateQuantity({ productId, quantity: newQuantity }));
   };
 
+  // Xử lý thanh toán VNPAY
+  const handleVNPayPayment = async (orderId) => {
+    try {
+      // Gọi API để lấy URL thanh toán VNPAY
+      const response = await fetch(`https://phamdangtuc-001-site1.ntempurl.com/CreatePaymentUrl?orderId=${orderId}`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.text();
+      console.log("VNPAY Response:", data);
+      
+      if (data) {
+        window.location.href = data;
+      } else {
+        throw new Error("Không nhận được URL thanh toán hợp lệ");
+      }
+    } catch (error) {
+      console.error("Lỗi khi tạo URL thanh toán:", error);
+      alert("Không thể tạo link thanh toán. Vui lòng thử lại!");
+    }
+  };
+
   // Xử lý đặt hàng
   const handleCheckout = async () => {
     if (!recipientName || !deliveryAddress || !shippingMethod) {
@@ -71,88 +95,63 @@ const Cart = () => {
       price: cartItems.reduce((sum, item) => sum + item.price, 0),
       quantity: cartItems.reduce((sum, item) => sum + item.quantity, 0),
       totalPrice,
-      status: orderStage,
+      status: "Chờ xử lý",
       paymentMethod: paymentMethod
     };
 
     try {
-      console.log("Sending order data:", orderData);
-      const response = await axiosInstance.post("/Orders", orderData);
-      console.log("API Response:", response);
+      // 1. Tạo đơn hàng
+      const orderResponse = await axiosInstance.post("/Orders", orderData);
+      const orderId = orderResponse.data.id || orderResponse.data.orderId;
+
+      // 2. Tạo order stage cho trạng thái đơn hàng
+      const stageData = {
+        orderId: orderId,
+        orderStageName: "Chờ xử lý",
+        updatedDate: new Date().toISOString()
+      };
       
-      if (response.data) {
-        console.log("Order created successfully:", response.data);
-        setOrderStatus("success");
-        dispatch(clearCart());
-        
-        // Tạo order stage cho trạng thái đơn hàng
-        const stageData = {
-          orderId: response.data.id || response.data.orderId,
-          orderStageName: orderStage,
+      await axiosInstance.post("/order-stages", stageData);
+
+      // 3. Xử lý theo phương thức thanh toán
+      if (paymentMethod === "online") {
+        // Thanh toán VNPAY
+        await handleVNPayPayment(orderId);
+      } else {
+        // Thanh toán COD
+        const paymentStageData = {
+          orderId: orderId,
+          orderStageName: "Chưa thanh toán",
           updatedDate: new Date().toISOString()
         };
         
-        try {
-          await axiosInstance.post("/order-stages", stageData);
-          console.log("Order stage created successfully");
-
-          // Tạo order stage cho trạng thái thanh toán
-          const paymentStageData = {
-            orderId: response.data.id || response.data.orderId,
-            orderStageName: paymentMethod === "online" ? "Đã thanh toán" : "Chưa thanh toán",
-            updatedDate: new Date().toISOString()
-          };
-          
-          await axiosInstance.post("/order-stages", paymentStageData);
-          console.log("Payment stage created successfully");
-        } catch (stageError) {
-          console.error("Error creating order stages:", stageError);
-        }
-
-        // Hiển thị thông báo thành công trong 2 giây
+        await axiosInstance.post("/order-stages", paymentStageData);
+        
+        dispatch(clearCart());
         setShowStatus(true);
         setTimeout(() => {
           setShowStatus(false);
-          // Sau khi ẩn thông báo, chuyển hướng đến trang member
           navigate("/member", { 
             state: { 
-              orderId: response.data.id || response.data.orderId,
+              orderId: orderId,
               orderDetails: {
                 recipientName,
                 deliveryAddress,
                 shippingMethod,
                 totalPrice,
                 orderDate: new Date().toLocaleString(),
-                status: orderStage,
-                paymentMethod: paymentMethod,
-                paymentStatus: paymentMethod === "online" ? "Đã thanh toán" : "Chưa thanh toán"
+                status: "Chờ xử lý",
+                paymentMethod: "cod",
+                paymentStatus: "Chưa thanh toán"
               }
             }
           });
         }, 2000);
-
-      } else {
-        throw new Error("Không nhận được dữ liệu từ server");
       }
     } catch (error) {
       console.error("Error details:", error);
       setOrderStatus("error");
-      if (error.response) {
-        console.log("Full error response:", error.response);
-        console.log("Error status:", error.response.status);
-        console.log("Error data:", error.response.data);
-        
-        const errorMessage = error.response.data?.message 
-          || error.response.data?.error 
-          || 'Đặt hàng thất bại';
-        alert(`❌ Lỗi: ${errorMessage}`);
-      } else if (error.request) {
-        console.log("Error request:", error.request);
-        alert("❌ Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng!");
-      } else {
-        console.log("Error message:", error.message);
-        alert("❌ Có lỗi xảy ra. Vui lòng thử lại!");
-      }
+      alert("Có lỗi xảy ra. Vui lòng thử lại!");
     } finally {
       setIsLoading(false);
     }

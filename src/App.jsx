@@ -35,6 +35,7 @@ import HandDetail from './pages/HandDetail';
 import OrderStatus from './pages/OrderStatus';
 import OrderTracking from './pages/OrderTracking';
 import ProfilePage from './pages/ProfilePage';
+import PaymentCallback from "./pages/PaymentCallback";
 
 // Component bảo vệ route dựa trên role
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -116,6 +117,7 @@ const AppContent = () => {
           <Route path="/checkout-confirmation" element={<ProtectedRoute allowedRoles={[3]}><CheckoutConfirmation /></ProtectedRoute>} />
           <Route path="/order-status" element={<ProtectedRoute allowedRoles={[3]}><OrderStatus /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute allowedRoles={[3]}><ProfilePage /></ProtectedRoute>} />
+          <Route path="/payment-callback" element={<PaymentCallback />} />
 
           {/* Fallback route */}
           <Route path="*" element={<Navigate to="/" />} />

@@ -71,11 +71,6 @@ const OrderTracking = () => {
     { value: 3, label: "Hoàn thành" }
   ];
 
-  const getPaymentStatusOptions = () => [
-    { value: 4, label: "Đã thanh toán" },
-    { value: 5, label: "Chưa thanh toán" }
-  ];
-
   const getOrderStage = (orderId) => {
     // Tìm tất cả các stages của order này
     const stages = orderStages.filter(stage => stage.orderId === orderId);
@@ -329,20 +324,11 @@ const OrderTracking = () => {
                               disabled={loading}
                             >
                               <option value="">Chọn trạng thái</option>
-                              <optgroup label="Trạng thái đơn hàng">
-                                {getOrderStatusOptions().map(option => (
-                                  <option key={option.value} value={option.value}>
-                                    {option.label}
-                                  </option>
-                                ))}
-                              </optgroup>
-                              <optgroup label="Trạng thái thanh toán">
-                                {getPaymentStatusOptions().map(option => (
-                                  <option key={option.value} value={option.value}>
-                                    {option.label}
-                                  </option>
-                                ))}
-                              </optgroup>
+                              {getOrderStatusOptions().map(option => (
+                                <option key={option.value} value={option.value}>
+                                  {option.label}
+                                </option>
+                              ))}
                             </select>
                             {selectedStatus[order.orderId] && (
                               <button
