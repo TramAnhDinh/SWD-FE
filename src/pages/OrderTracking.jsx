@@ -1,425 +1,333 @@
-// import { useEffect, useState } from "react";
-// import { useSelector } from "react-redux";
-// import "./OrderTracking.css"; // Import CSS riêng
-
-// const OrderTracking = () => {
-//   const { role } = useSelector((state) => state.user);
-//   const [orders, setOrders] = useState([]);
-//   const [loading, setLoading] = useState(true);
-//   const [error, setError] = useState("");
-
-//   useEffect(() => {
-//     if (role === "staff") {
-//       fetch("https://phamdangtuc-001-site1.ntempurl.com/api/Orders")
-//         .then((res) => res.json())
-//         .then((data) => {
-//           console.log("📦 API Response:", data);
-//           if (data?.$values) {
-//             setOrders(data.$values); // Lấy danh sách đơn hàng từ API
-//           } else {
-//             setError("Dữ liệu không hợp lệ!");
-//           }
-//         })
-//         .catch((err) => {
-//           console.error("❌ Lỗi khi tải dữ liệu:", err);
-//           setError("Không thể tải dữ liệu đơn hàng!");
-//         })
-//         .finally(() => setLoading(false));
-//     }
-//   }, [role]);
-
-//   if (role !== "staff") return <h1 className="error">⚠ Bạn không có quyền truy cập</h1>;
-//   if (loading) return <p className="loading">⏳ Đang tải...</p>;
-//   if (error) return <p className="error">❌ {error}</p>;
-
-//   return (
-//     <div className="order-tracking-container">
-//       <h1>📦 Danh Sách Đơn Hàng</h1>
-//       {orders.length > 0 ? (
-//         <table className="order-table">
-//           <thead>
-//             <tr>
-//               <th>ID</th>
-//               <th>Người Nhận</th>
-//               <th>Địa Chỉ</th>
-//               <th>Phương Thức Giao</th>
-//               <th>Giá</th>
-//               <th>Số Lượng</th>
-//               <th>Tổng Tiền</th>
-//               <th>Ghi Chú</th>
-//               <th className="border border-gray-300 px-4 py-2">Chi Tiết</th>
-//             </tr>
-//           </thead>
-//           <tbody>
-//             {orders.map((order, index) => (
-//               <tr key={index}>
-//                 <td>{order.orderId}</td>
-//                 <td>{order.recipientName}</td>
-//                 <td>{order.deliveryAddress}</td>
-//                 <td>{order.shippingMethod}</td>
-//                 <td>{order.price} VND</td>
-//                 <td>{order.quantity}</td>
-//                 <td>{order.totalPrice} VND</td>
-//                 <td>{order.notes || "Không có"}</td>
-//                 <td className="border border-gray-300 px-4 py-2">
-//                   <button className="bg-blue-500 text-white px-3 py-1 rounded">Chi tiết</button>
-//                 </td>
-//               </tr>
-//             ))}
-//           </tbody>
-//         </table>
-//       ) : (
-//         <p className="no-orders">🚫 Không có đơn hàng nào.</p>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default OrderTracking;
-
-
-// import { useEffect, useState } from "react";
-// import { useSelector } from "react-redux";
-// import "./OrderTracking.css"; // Import CSS riêng
-
-// const OrderTracking = () => {
-//   const { role } = useSelector((state) => state.user);
-//   const [orders, setOrders] = useState([]);
-//   const [loading, setLoading] = useState(true);
-//   const [error, setError] = useState("");
-//   const [selectedOrder, setSelectedOrder] = useState(null);
-//   const [orderProducts, setOrderProducts] = useState([]); // Lưu danh sách sản phẩm
-
-//   useEffect(() => {
-//     if (role === "staff") {
-//       fetch("https://phamdangtuc-001-site1.ntempurl.com/api/Orders")
-//         .then((res) => res.json())
-//         .then((data) => {
-//           console.log("📦 API Response:", data);
-//           if (data?.$values) {
-//             setOrders(data.$values); // Lấy danh sách đơn hàng từ API
-//           } else {
-//             setError("Dữ liệu không hợp lệ!");
-//           }
-//         })
-//         .catch((err) => {
-//           console.error("❌ Lỗi khi tải dữ liệu:", err);
-//           setError("Không thể tải dữ liệu đơn hàng!");
-//         })
-//         .finally(() => setLoading(false));
-//     }
-//   }, [role]);
-
-//   // Lấy danh sách sản phẩm theo orderId
-//   // const handleShowDetails = (order) => {
-//   //   setSelectedOrder(order);
-
-//   //   fetch(`https://phamdangtuc-001-site1.ntempurl.com/api/Orders/${order.orderId}/products`)
-//   //     .then((res) => res.json())
-//   //     .then((data) => {
-//   //       console.log(`🛒 Sản phẩm của đơn ${order.orderId}:`, data);
-//   //       setOrderProducts(data?.$values || []);
-//   //     })
-//   //     .catch((err) => {
-//   //       console.error("❌ Lỗi khi tải sản phẩm:", err);
-//   //       setOrderProducts([]);
-//   //     });
-//   // };
-//   const handleShowDetails = (order) => {
-//     setSelectedOrder(order);
-//     setOrderProducts(order.product || []); // Reset danh sách sản phẩm cũ
-  
-//     fetch(`https://phamdangtuc-001-site1.ntempurl.com/api/OrderDetails?orderId=${order.orderId}`)
-    
-//       .then((res) => {
-//         if (!res.ok) {
-//           throw new Error(`Lỗi ${res.status}: API không tồn tại`);
-//         }
-//         return res.json();
-//       })
-//       .then((data) => {
-//         console.log(`🛒 Sản phẩm của đơn ${order.orderId}:`, data);
-//         setOrderProducts(data?.$values || []);
-//       })
-//       .catch((err) => {
-//         console.error("❌ Lỗi khi tải sản phẩm:", err);
-//         setOrderProducts([]); // Nếu lỗi thì không hiển thị sản phẩm
-//       });
-//   };
-  
-
-//   if (role !== "staff") return <h1 className="error">⚠ Bạn không có quyền truy cập</h1>;
-//   if (loading) return <p className="loading">⏳ Đang tải...</p>;
-//   if (error) return <p className="error">❌ {error}</p>;
-
-//   return (
-//     <div className="order-tracking-container">
-//       <h1>📦 Danh Sách Đơn Hàng</h1>
-//       {orders.length > 0 ? (
-//         <table className="order-table">
-//           <thead>
-//             <tr>
-//               <th>ID</th>
-//               <th>Người Nhận</th>
-//               <th>Địa Chỉ</th>
-//               <th>Phương Thức Giao</th>
-//               <th>Giá</th>
-//               <th>Số Lượng</th>
-//               <th>Tổng Tiền</th>
-//               <th>Ghi Chú</th>
-//               <th>Chi Tiết</th>
-//             </tr>
-//           </thead>
-//           <tbody>
-//             {orders.map((order, index) => (
-//               <tr key={index}>
-//                 <td>{order.orderId}</td>
-//                 <td>{order.recipientName}</td>
-//                 <td>{order.deliveryAddress}</td>
-//                 <td>{order.shippingMethod}</td>
-//                 <td>{order.price} VND</td>
-//                 <td>{order.quantity}</td>
-//                 <td>{order.totalPrice} VND</td>
-//                 <td>{order.notes || "Không có"}</td>
-//                 <td>
-//                   <button
-//                     className="bg-blue-500 text-white px-3 py-1 rounded"
-//                     onClick={() => handleShowDetails(order)}
-//                   >
-//                     Chi tiết
-//                   </button>
-//                 </td>
-//               </tr>
-//             ))}
-//           </tbody>
-//         </table>
-//       ) : (
-//         <p className="no-orders">🚫 Không có đơn hàng nào.</p>
-//       )}
-
-//       {/* Modal hiển thị chi tiết đơn hàng */}
-//       {selectedOrder && (
-//         <div className="modal-overlay">
-//           <div className="modal-content">
-//             <h2>🛍 Chi Tiết Đơn Hàng</h2>
-//             <p><strong>ID:</strong> {selectedOrder.orderId}</p>
-//             <p><strong>Người Nhận:</strong> {selectedOrder.recipientName}</p>
-//             <p><strong>Địa Chỉ:</strong> {selectedOrder.deliveryAddress}</p>
-//             <p><strong>Phương Thức Giao:</strong> {selectedOrder.shippingMethod}</p>
-//             <p><strong>Tổng Tiền:</strong> {selectedOrder.totalPrice} VND</p>
-
-//             <h3>📌 Sản Phẩm Trong Đơn:</h3>
-//             {orderProducts.length === 0 ? (
-//               <p className="text-gray-500">Không có sản phẩm nào trong đơn hàng này.</p>
-//             ) : (
-//               <ul>
-//                 {orderProducts.map((product) => (
-//                   <li key={product.productId}>
-//                     {product.name} - {product.price} VND (x{product.quantity})
-//                   </li>
-//                 ))}
-//               </ul>
-//             )}
-
-//             <button className="close-btn" onClick={() => setSelectedOrder(null)}>Đóng</button>
-//           </div>
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default OrderTracking;
-
-// import { useEffect, useState } from "react";
-// import { useSelector } from "react-redux";
-// import "./OrderTracking.css";
-
-// const OrderTracking = () => {
-//   const { role } = useSelector((state) => state.user);
-//   const [orders, setOrders] = useState([]);
-//   const [orderProducts, setOrderProducts] = useState([]); // 🛒 Danh sách sản phẩm trong đơn hàng
-//   const [selectedOrderId, setSelectedOrderId] = useState(null); // Lưu orderId đang xem
-
-//   useEffect(() => {
-//     if (role === "staff") {
-//       fetch("https://phamdangtuc-001-site1.ntempurl.com/api/Orders")
-//         .then((res) => res.json())
-//         .then((data) => {
-//           if (data?.$values) {
-//             setOrders(data.$values);
-//           } else {
-//             console.error("Dữ liệu không hợp lệ!");
-//           }
-//         })
-//         .catch((err) => console.error("❌ Lỗi khi tải dữ liệu:", err));
-//     }
-//   }, [role]);
-
-//   const handleShowDetails = (orderId) => {
-//     setSelectedOrderId(orderId); // Lưu đơn hàng đang xem
-
-//     fetch(`https://phamdangtuc-001-site1.ntempurl.com/api/Product`)
-//       .then((res) => {
-//         if (!res.ok) throw new Error(`Lỗi ${res.status}: API không tồn tại`);
-//         return res.json();
-//       })
-//       .then((data) => {
-//         console.log(`🛒 Sản phẩm của đơn ${orderId}:`, data);
-//         setOrderProducts(data?.$values || []);
-//       })
-//       .catch((err) => {
-//         console.error("❌ Lỗi khi tải sản phẩm:", err);
-//         setOrderProducts([]); // Nếu lỗi thì không hiển thị sản phẩm
-//       });
-//   };
-
-//   if (role !== "staff") return <h1 className="error">⚠ Bạn không có quyền truy cập</h1>;
-
-//   return (
-//     <div className="order-tracking-container">
-//       <h1>📦 Danh Sách Đơn Hàng</h1>
-//       {orders.length > 0 ? (
-//         <table className="order-table">
-//           <thead>
-//             <tr>
-//               <th>ID</th>
-//               <th>Người Nhận</th>
-//               <th>Địa Chỉ</th>
-//               <th>Phương Thức Giao</th>
-//               <th>Giá</th>
-//               <th>Số Lượng</th>
-//               <th>Tổng Tiền</th>
-//               <th>Ghi Chú</th>
-//               <th>Chi Tiết</th>
-//             </tr>
-//           </thead>
-//           <tbody>
-//             {orders.map((order) => (
-//               <tr key={order.orderId}>
-//                 <td>{order.orderId}</td>
-//                 <td>{order.recipientName}</td>
-//                 <td>{order.deliveryAddress}</td>
-//                 <td>{order.shippingMethod}</td>
-//                 <td>{order.price} VND</td>
-//                 <td>{order.quantity}</td>
-//                 <td>{order.totalPrice} VND</td>
-//                 <td>{order.notes || "Không có"}</td>
-//                 <td>
-//                   <button 
-//                     className="bg-blue-500 text-white px-3 py-1 rounded"
-//                     onClick={() => handleShowDetails(order.orderId)}
-//                   >
-//                     Chi tiết
-//                   </button>
-//                 </td>
-//               </tr>
-//             ))}
-//           </tbody>
-//         </table>
-//       ) : (
-//         <p className="no-orders">🚫 Không có đơn hàng nào.</p>
-//       )}
-
-//       {/* 🛒 Hiển thị giỏ hàng khi bấm "Chi tiết" */}
-//       {selectedOrderId && (
-//         <div className="cart-container">
-//           <h2>🛒 Sản phẩm của đơn {selectedOrderId}</h2>
-//           {orderProducts.length > 0 ? (
-//             <ul className="cart-list">
-//               {orderProducts.map((product) => (
-//                 <li key={product.productId} className="cart-item">
-//                   <img src={product.imageUrl} alt={product.productName} className="cart-img" />
-//                   <div className="cart-info">
-//                     <p className="cart-name">{product.productName}</p>
-//                     <p className="cart-price">{product.price} VND</p>
-//                     <p className="cart-quantity">Số lượng: {product.quantity}</p>
-//                   </div>
-//                 </li>
-//               ))}
-//             </ul>
-//           ) : (
-//             <p>Không có sản phẩm nào trong đơn này.</p>
-//           )}
-//         </div>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default OrderTracking;
-
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom"; // Import điều hướng
+import { useNavigate } from "react-router-dom";
 import "./OrderTracking.css";
 
 const OrderTracking = () => {
   const { role } = useSelector((state) => state.user);
   const [orders, setOrders] = useState([]);
-  const navigate = useNavigate(); // Dùng để chuyển trang
+  const [orderStages, setOrderStages] = useState([]);
+  const [selectedStatus, setSelectedStatus] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
+
+  // Thêm state cho phân trang
+  const [currentPage, setCurrentPage] = useState(1);
+  const [ordersPerPage] = useState(20);
+
+  // Tính toán các đơn hàng cho trang hiện tại
+  const indexOfLastOrder = currentPage * ordersPerPage;
+  const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
+  const currentOrders = orders.slice(indexOfFirstOrder, indexOfLastOrder);
+  const totalPages = Math.ceil(orders.length / ordersPerPage);
+
+  // Hàm chuyển trang
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   useEffect(() => {
     if (role === "staff") {
-      fetch("https://phamdangtuc-001-site1.ntempurl.com/api/Orders")
-        .then((res) => res.json())
-        .then((data) => {
-          if (data?.$values) {
-            setOrders(data.$values);
-          } else {
-            console.error("Dữ liệu không hợp lệ!");
-          }
-        })
-        .catch((err) => console.error("❌ Lỗi khi tải dữ liệu:", err));
+      fetchOrders();
+      fetchOrderStages();
     }
   }, [role]);
+
+  const fetchOrders = async () => {
+    try {
+      const response = await fetch("https://phamdangtuc-001-site1.ntempurl.com/api/Orders");
+      const data = await response.json();
+      if (data?.$values) {
+        setOrders(data.$values);
+      } else {
+        console.error("Dữ liệu không hợp lệ!");
+      }
+    } catch (err) {
+      console.error("❌ Lỗi khi tải dữ liệu:", err);
+    }
+  };
+
+  const fetchOrderStages = async () => {
+    try {
+      const response = await fetch("https://phamdangtuc-001-site1.ntempurl.com/api/order-stages");
+      const data = await response.json();
+      if (data?.data?.$values) {
+        setOrderStages(data.data.$values);
+      }
+    } catch (err) {
+      console.error("❌ Lỗi khi tải trạng thái đơn hàng:", err);
+    }
+  };
+
+  const getOrderStage = (orderId) => {
+    // Tìm tất cả các stages của order này
+    const stages = orderStages.filter(stage => stage.orderId === orderId);
+    if (stages.length === 0) return "Chờ xử lý";
+    
+    // Lấy stage mới nhất
+    const latestStage = stages.sort((a, b) => 
+      new Date(b.updatedDate) - new Date(a.updatedDate)
+    )[0];
+    
+    return latestStage.orderStageName;
+  };
+
+  const getStageStyle = (stage) => {
+    switch (stage) {
+      case "Chờ xử lý":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      case "Đã xác nhận":
+        return "bg-blue-100 text-blue-800 border-blue-200";
+      case "Đang giao":
+        return "bg-purple-100 text-purple-800 border-purple-200";
+      case "Hoàn thành":
+        return "bg-green-100 text-green-800 border-green-200";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200";
+    }
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('vi-VN', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit'
+    }).format(date);
+  };
+
+  const handleStatusChange = (orderId, newStatus) => {
+    setSelectedStatus(prev => ({
+      ...prev,
+      [orderId]: newStatus
+    }));
+  };
+
+  const handleUpdateStatus = async (orderId) => {
+    const newStatus = selectedStatus[orderId];
+    if (!newStatus) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const currentOrder = orders.find(o => o.orderId === orderId);
+      if (!currentOrder) {
+        throw new Error("Không tìm thấy thông tin đơn hàng");
+      }
+
+      // Tạo stage mới
+      const stageResponse = await fetch("https://phamdangtuc-001-site1.ntempurl.com/api/order-stages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          orderId: orderId,
+          orderStageName: getStatusLabel(newStatus),
+          updatedDate: new Date().toISOString()
+        }),
+      });
+
+      if (!stageResponse.ok) {
+        throw new Error(`HTTP error! status: ${stageResponse.status}`);
+      }
+
+      // Refresh order stages để lấy stage mới nhất
+      await fetchOrderStages();
+      
+      // Reset selected status
+      setSelectedStatus(prev => {
+        const newStatus = { ...prev };
+        delete newStatus[orderId];
+        return newStatus;
+      });
+
+      alert("Cập nhật trạng thái thành công!");
+    } catch (error) {
+      console.error("Error updating order status:", error);
+      setError("Không thể cập nhật trạng thái. Vui lòng thử lại!");
+      alert("Có lỗi xảy ra khi cập nhật trạng thái!");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getOrderStatusOptions = () => [
+    { value: 0, label: "Chờ xử lý" },
+    { value: 1, label: "Đã xác nhận" },
+    { value: 2, label: "Đang giao" },
+    { value: 3, label: "Hoàn thành" }
+  ];
+
+  const getStatusLabel = (status) => {
+    const option = getOrderStatusOptions().find(opt => opt.value === status);
+    return option ? option.label : "Chờ xử lý";
+  };
 
   if (role !== "staff") return <h1 className="error">⚠ Bạn không có quyền truy cập</h1>;
 
   return (
-    <div className="order-tracking-container">
-      <h1>📦 Danh Sách Đơn Hàng</h1>
-      {orders.length > 0 ? (
-        <table className="order-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Người Nhận</th>
-              <th>Địa Chỉ</th>
-              <th>Phương Thức Giao</th>
-              <th>Giá</th>
-              <th>Số Lượng</th>
-              <th>Tổng Tiền</th>
-              <th>Ghi Chú</th>
-              <th>Chi Tiết</th>
-            </tr>
-          </thead>
-          <tbody>
-            {orders.map((order) => (
-              <tr key={order.orderId}>
-                <td>{order.orderId}</td>
-                <td>{order.recipientName}</td>
-                <td>{order.deliveryAddress}</td>
-                <td>{order.shippingMethod}</td>
-                <td>{order.price} VND</td>
-                <td>{order.quantity}</td>
-                <td>{order.totalPrice} VND</td>
-                <td>{order.notes || "Không có"}</td>
-                <td>
-                  <button 
-                    className="bg-blue-500 text-white px-3 py-1 rounded"
-                    onClick={() => navigate(`/order-detail/${order.orderId}`)}
-                  >
-                    Chi tiết
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      ) : (
-        <p className="no-orders">🚫 Không có đơn hàng nào.</p>
-      )}
+    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h1 className="text-2xl font-bold text-gray-900">📦 Danh Sách Đơn Hàng</h1>
+          </div>
+          
+          {error && (
+            <div className="bg-red-50 border-l-4 border-red-400 p-4 mx-4 mt-4">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm text-red-700">{error}</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {orders.length > 0 ? (
+            <>
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ngày Đặt</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Người Nhận</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Địa Chỉ</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phương Thức Giao</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Giá</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Số Lượng</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tổng Tiền</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Số điện thoại</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng Thái</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cập Nhật</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Chi Tiết</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {currentOrders.map((order) => (
+                      <tr key={order.orderId} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{order.orderId}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(order.orderDate)}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{order.recipientName}</td>
+                        <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">{order.deliveryAddress}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.shippingMethod}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{new Intl.NumberFormat('vi-VN').format(order.price)} VND</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{order.quantity}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{new Intl.NumberFormat('vi-VN').format(order.totalPrice)} VND</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.notes || "N/A"}</td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getStageStyle(getOrderStage(order.orderId))}`}>
+                            {getOrderStage(order.orderId)}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center gap-2">
+                            <select
+                              className="border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              value={selectedStatus[order.orderId] || ""}
+                              onChange={(e) => handleStatusChange(order.orderId, Number(e.target.value))}
+                              disabled={loading}
+                            >
+                              <option value="">Chọn trạng thái</option>
+                              {getOrderStatusOptions().map(option => (
+                                <option key={option.value} value={option.value}>
+                                  {option.label}
+                                </option>
+                              ))}
+                            </select>
+                            {selectedStatus[order.orderId] && (
+                              <button
+                                className={`bg-green-500 text-white px-2 py-1 rounded text-sm hover:bg-green-600 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                onClick={() => handleUpdateStatus(order.orderId)}
+                                disabled={loading}
+                              >
+                                {loading ? 'Đang cập nhật...' : 'Cập nhật'}
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <button 
+                            className="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                            onClick={() => navigate(`/order-detail/${order.orderId}`)}
+                          >
+                            Chi tiết
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Phân trang */}
+              <div className="px-6 py-4 flex items-center justify-between border-t border-gray-200">
+                <div className="flex-1 flex justify-between items-center">
+                  <div>
+                    <p className="text-sm text-gray-700">
+                      Hiển thị <span className="font-medium">{indexOfFirstOrder + 1}</span> đến{" "}
+                      <span className="font-medium">
+                        {Math.min(indexOfLastOrder, orders.length)}
+                      </span>{" "}
+                      trong tổng số <span className="font-medium">{orders.length}</span> đơn hàng
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => paginate(currentPage - 1)}
+                      disabled={currentPage === 1}
+                      className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
+                        currentPage === 1
+                          ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                          : "bg-white text-gray-700 hover:bg-gray-50"
+                      }`}
+                    >
+                      Trước
+                    </button>
+                    {[...Array(totalPages)].map((_, index) => (
+                      <button
+                        key={index + 1}
+                        onClick={() => paginate(index + 1)}
+                        className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium rounded-md ${
+                          currentPage === index + 1
+                            ? "bg-blue-500 text-white border-blue-500"
+                            : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                        }`}
+                      >
+                        {index + 1}
+                      </button>
+                    ))}
+                    <button
+                      onClick={() => paginate(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                      className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
+                        currentPage === totalPages
+                          ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                          : "bg-white text-gray-700 hover:bg-gray-50"
+                      }`}
+                    >
+                      Sau
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="px-6 py-4 text-center text-gray-500">
+              <p className="text-lg">🚫 Không có đơn hàng nào.</p>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

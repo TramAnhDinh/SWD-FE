@@ -201,7 +201,7 @@ const Header = () => {
 
   // Lấy giỏ hàng từ Redux
   const cart = useSelector((state) => state.cart.items ?? []);
-  const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
+  const cartItemCount = useSelector((state) => state.cart.items.length);
 
   // Xử lý logout
   const handleLogout = () => {
@@ -336,9 +336,9 @@ const Header = () => {
             <Link to="/lien-he" className="hover:text-orange-400 text-xl">LIÊN HỆ</Link>
             <Link to="/cart" className="hover:text-orange-400 relative">
               <ShoppingCart />
-              {totalItems > 0 && (
+              {cartItemCount > 0 && (
                 <span className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full text-xs px-2">
-                  {totalItems}
+                  {cartItemCount}
                 </span>
               )}
             </Link>
