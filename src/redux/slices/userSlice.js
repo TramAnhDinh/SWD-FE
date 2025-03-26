@@ -1,35 +1,88 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { clearCart } from "./cartSlice";
 
-const initialState = {
-  user: {
-    userId: "",  // Đảm bảo có userId
-    username: "",
-    email: "",
-  },
-  // user: null,
-  // // role: null,
-  // role: localStorage.getItem("role") || "",
-  // token: null,
+const loadUserFromStorage = () => {
+  try {
+    const token = localStorage.getItem("token");
+    const userStr = localStorage.getItem("user");
+    if (!token || !userStr) return null;
+    
+    const user = JSON.parse(userStr);
+    return {
+      token,
+      role: user.role,
+      username: user.username,
+      isAuthenticated: true
+    };
+  } catch (error) {
+    console.error("Error loading user from storage:", error);
+    return null;
+  }
 };
 
+const initialState = loadUserFromStorage() || {
+  token: null,
+  role: null,
+  username: null,
+  isAuthenticated: false,
+};
+
+// Create logout thunk
+export const logoutAndClearCart = createAsyncThunk(
+  'user/logoutAndClearCart',
+  async (_, { dispatch }) => {
+    dispatch(clearCart());
+    dispatch(logout());
+  }
+);
+
 const userSlice = createSlice({
-  name: "auth",
+  name: "user",
   initialState,
   reducers: {
-    login: (state, action) => {
-      state.user = action.payload.user;
-      state.role = action.payload.role;
-      state.token = action.payload.token;
-      localStorage.setItem("role", action.payload.role); // Lưu vào localStorage
+    setUser: (state, action) => {
+      const { token, role, username } = action.payload;
+      
+      // Validate data before saving
+      if (!token || !role || !username) {
+        console.error("Invalid user data:", action.payload);
+        return;
+      }
+
+      // Update state
+      state.token = token;
+      state.role = role;
+      state.username = username;
+      state.isAuthenticated = true;
+      
+      // Save to localStorage
+      try {
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify({ role, username }));
+      } catch (error) {
+        console.error("Error saving user to storage:", error);
+      }
     },
     logout: (state) => {
-      state.user = null;
+      // Lưu username hiện tại trước khi logout để giữ giỏ hàng
+      const currentUsername = state.username;
+      
+      // Reset user state
+      state.token = null;
       state.role = null;
+      state.username = null;
+      state.isAuthenticated = false;
+      
+      // Chỉ xóa thông tin đăng nhập, giữ lại giỏ hàng
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      
+      console.log(`Logged out. Cart data for ${currentUsername} is preserved.`);
     },
   },
 });
 
-export const { login, logout } = userSlice.actions;
+export const { setUser, logout } = userSlice.actions;
 export default userSlice.reducer;
 
 // import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";

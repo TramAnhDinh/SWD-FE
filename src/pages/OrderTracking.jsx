@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import axiosInstance from "../utils/axiosInstance";
 import "./OrderTracking.css";
 
 const OrderTracking = () => {
@@ -34,41 +35,70 @@ const OrderTracking = () => {
 
   const fetchOrders = async () => {
     try {
-      const response = await fetch("https://phamdangtuc-001-site1.ntempurl.com/api/Orders");
-      const data = await response.json();
-      if (data?.$values) {
-        setOrders(data.$values);
+      const response = await axiosInstance.get("/Orders");
+      if (response.data?.$values) {
+        console.log("Orders data:", response.data.$values);
+        setOrders(response.data.$values);
       } else {
         console.error("Dữ liệu không hợp lệ!");
       }
     } catch (err) {
       console.error("❌ Lỗi khi tải dữ liệu:", err);
+      if (err.response?.status === 401) {
+        navigate("/login");
+      }
     }
   };
 
   const fetchOrderStages = async () => {
     try {
-      const response = await fetch("https://phamdangtuc-001-site1.ntempurl.com/api/order-stages");
-      const data = await response.json();
-      if (data?.data?.$values) {
-        setOrderStages(data.data.$values);
+      const response = await axiosInstance.get("/order-stages");
+      if (response.data?.data?.$values) {
+        setOrderStages(response.data.data.$values);
       }
     } catch (err) {
       console.error("❌ Lỗi khi tải trạng thái đơn hàng:", err);
+      if (err.response?.status === 401) {
+        navigate("/login");
+      }
     }
   };
+
+  const getOrderStatusOptions = () => [
+    { value: 0, label: "Chờ xử lý" },
+    { value: 1, label: "Đã xác nhận" },
+    { value: 2, label: "Đang giao" },
+    { value: 3, label: "Hoàn thành" }
+  ];
+
+  const getPaymentStatusOptions = () => [
+    { value: 4, label: "Đã thanh toán" },
+    { value: 5, label: "Chưa thanh toán" }
+  ];
 
   const getOrderStage = (orderId) => {
     // Tìm tất cả các stages của order này
     const stages = orderStages.filter(stage => stage.orderId === orderId);
     if (stages.length === 0) return "Chờ xử lý";
     
-    // Lấy stage mới nhất
-    const latestStage = stages.sort((a, b) => 
-      new Date(b.updatedDate) - new Date(a.updatedDate)
-    )[0];
+    // Lấy stage mới nhất không phải trạng thái thanh toán
+    const latestStage = stages
+      .filter(stage => !["Đã thanh toán", "Chưa thanh toán"].includes(stage.orderStageName))
+      .sort((a, b) => new Date(b.updatedDate) - new Date(a.updatedDate))[0];
     
-    return latestStage.orderStageName;
+    return latestStage ? latestStage.orderStageName : "Chờ xử lý";
+  };
+
+  const getPaymentStage = (orderId) => {
+    // Tìm tất cả các stages của order này
+    const stages = orderStages.filter(stage => stage.orderId === orderId);
+    
+    // Lấy stage thanh toán mới nhất
+    const paymentStage = stages
+      .filter(stage => ["Đã thanh toán", "Chưa thanh toán"].includes(stage.orderStageName))
+      .sort((a, b) => new Date(b.updatedDate) - new Date(a.updatedDate))[0];
+    
+    return paymentStage ? paymentStage.orderStageName : "Chưa thanh toán";
   };
 
   const getStageStyle = (stage) => {
@@ -81,6 +111,10 @@ const OrderTracking = () => {
         return "bg-purple-100 text-purple-800 border-purple-200";
       case "Hoàn thành":
         return "bg-green-100 text-green-800 border-green-200";
+      case "Đã thanh toán":
+        return "bg-green-100 text-green-800 border-green-200";
+      case "Chưa thanh toán":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
       default:
         return "bg-gray-100 text-gray-800 border-gray-200";
     }
@@ -119,20 +153,14 @@ const OrderTracking = () => {
       }
 
       // Tạo stage mới
-      const stageResponse = await fetch("https://phamdangtuc-001-site1.ntempurl.com/api/order-stages", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          orderId: orderId,
-          orderStageName: getStatusLabel(newStatus),
-          updatedDate: new Date().toISOString()
-        }),
+      const response = await axiosInstance.post("/order-stages", {
+        orderId: orderId,
+        orderStageName: getStatusLabel(newStatus),
+        updatedDate: new Date().toISOString()
       });
 
-      if (!stageResponse.ok) {
-        throw new Error(`HTTP error! status: ${stageResponse.status}`);
+      if (!response.data) {
+        throw new Error("Không nhận được phản hồi từ server");
       }
 
       // Refresh order stages để lấy stage mới nhất
@@ -155,16 +183,73 @@ const OrderTracking = () => {
     }
   };
 
-  const getOrderStatusOptions = () => [
-    { value: 0, label: "Chờ xử lý" },
-    { value: 1, label: "Đã xác nhận" },
-    { value: 2, label: "Đang giao" },
-    { value: 3, label: "Hoàn thành" }
-  ];
-
   const getStatusLabel = (status) => {
     const option = getOrderStatusOptions().find(opt => opt.value === status);
     return option ? option.label : "Chờ xử lý";
+  };
+
+  const getPaymentStatusStyle = (orderId) => {
+    const stages = orderStages.filter(stage => stage.orderId === orderId);
+    const paymentStage = stages.find(stage => 
+      stage.orderStageName === "Đã thanh toán" || stage.orderStageName === "Chưa thanh toán"
+    );
+
+    if (!paymentStage) return "bg-gray-100 text-gray-800 border-gray-200";
+    
+    switch (paymentStage.orderStageName) {
+      case "Đã thanh toán":
+        return "bg-green-100 text-green-800 border-green-200";
+      case "Chưa thanh toán":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-200";
+    }
+  };
+
+  const getPaymentStatusText = (orderId) => {
+    const stages = orderStages.filter(stage => stage.orderId === orderId);
+    const paymentStage = stages.find(stage => 
+      stage.orderStageName === "Đã thanh toán" || stage.orderStageName === "Chưa thanh toán"
+    );
+
+    if (!paymentStage) return "Chưa xác định";
+    return paymentStage.orderStageName;
+  };
+
+  const handleUpdatePaymentStatus = async (orderId, newStatus) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      // Tạo stage mới cho trạng thái thanh toán
+      const response = await axiosInstance.post("/order-stages", {
+        orderId: orderId,
+        orderStageName: newStatus === 4 ? "Đã thanh toán" : "Chưa thanh toán",
+        updatedDate: new Date().toISOString()
+      });
+
+      if (!response.data) {
+        throw new Error("Không nhận được phản hồi từ server");
+      }
+
+      // Refresh order stages để lấy stage mới nhất
+      await fetchOrderStages();
+      
+      // Reset selected status
+      setSelectedStatus(prev => {
+        const newStatus = { ...prev };
+        delete newStatus[orderId];
+        return newStatus;
+      });
+
+      alert("Cập nhật trạng thái thanh toán thành công!");
+    } catch (error) {
+      console.error("Error updating payment status:", error);
+      setError("Không thể cập nhật trạng thái thanh toán. Vui lòng thử lại!");
+      alert("Có lỗi xảy ra khi cập nhật trạng thái thanh toán!");
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (role !== "staff") return <h1 className="error">⚠ Bạn không có quyền truy cập</h1>;
@@ -207,8 +292,9 @@ const OrderTracking = () => {
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Số Lượng</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tổng Tiền</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Số điện thoại</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng Thái</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cập Nhật</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái đơn</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái thanh toán</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cập nhật</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Chi Tiết</th>
                     </tr>
                   </thead>
@@ -230,6 +316,11 @@ const OrderTracking = () => {
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getStageStyle(getPaymentStage(order.orderId))}`}>
+                            {getPaymentStage(order.orderId)}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center gap-2">
                             <select
                               className="border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -238,11 +329,20 @@ const OrderTracking = () => {
                               disabled={loading}
                             >
                               <option value="">Chọn trạng thái</option>
-                              {getOrderStatusOptions().map(option => (
-                                <option key={option.value} value={option.value}>
-                                  {option.label}
-                                </option>
-                              ))}
+                              <optgroup label="Trạng thái đơn hàng">
+                                {getOrderStatusOptions().map(option => (
+                                  <option key={option.value} value={option.value}>
+                                    {option.label}
+                                  </option>
+                                ))}
+                              </optgroup>
+                              <optgroup label="Trạng thái thanh toán">
+                                {getPaymentStatusOptions().map(option => (
+                                  <option key={option.value} value={option.value}>
+                                    {option.label}
+                                  </option>
+                                ))}
+                              </optgroup>
                             </select>
                             {selectedStatus[order.orderId] && (
                               <button

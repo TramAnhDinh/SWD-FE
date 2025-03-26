@@ -38,14 +38,32 @@ import ProfilePage from './pages/ProfilePage';
 
 // Component bảo vệ route dựa trên role
 const ProtectedRoute = ({ children, allowedRoles }) => {
-  const { user, role } = useSelector((state) => state.user);
+  const { role, isAuthenticated } = useSelector((state) => state.user);
   
-  if (!user) return <Navigate to="/login" replace />;
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
   
   // Chuyển đổi role string thành roleId tương ứng
-  const roleId = role === "staff" ? 2 : role === "member" ? 3 : 1;
+  let roleId;
+  switch(role) {
+    case "admin":
+      roleId = 1;
+      break;
+    case "staff":
+      roleId = 2;
+      break;
+    case "member":
+      roleId = 3;
+      break;
+    default:
+      roleId = 0; // Không có quyền
+  }
   
-  if (!allowedRoles.includes(roleId)) return <Navigate to="/" replace />;
+  if (!allowedRoles.includes(roleId)) {
+    console.log(`Access denied: User role ${role} (${roleId}) not in allowed roles ${allowedRoles}`);
+    return <Navigate to="/" replace />;
+  }
   
   return children;
 };

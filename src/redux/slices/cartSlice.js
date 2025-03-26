@@ -1,8 +1,28 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-// 🔄 Lấy dữ liệu từ localStorage khi khởi tạo
+// Helper function to get cart key for current user
+const getCartKey = () => {
+  const userStr = localStorage.getItem("user");
+  if (!userStr) return "cart";
+  const user = JSON.parse(userStr);
+  return `cart_${user.username}`;
+};
+
+// Helper function to load cart from localStorage
+const loadCartFromStorage = () => {
+  const cartKey = getCartKey();
+  const cartData = localStorage.getItem(cartKey);
+  return cartData ? JSON.parse(cartData) : [];
+};
+
+// Helper function to save cart to localStorage
+const saveCartToStorage = (items) => {
+  const cartKey = getCartKey();
+  localStorage.setItem(cartKey, JSON.stringify(items));
+};
+
 const initialState = {
-  items: JSON.parse(localStorage.getItem("cart")) || [],
+  items: loadCartFromStorage(),
 };
 
 const cartSlice = createSlice({
@@ -12,21 +32,18 @@ const cartSlice = createSlice({
     addToCart: (state, action) => {
       console.log("🛒 Thêm vào giỏ hàng:", action.payload);
 
-      // Kiểm tra xem sản phẩm đã có trong giỏ hay chưa
       const itemIndex = state.items.findIndex(
         (product) => product.productId === action.payload.productId
       );
 
       if (itemIndex >= 0) {
-        // 🔄 Nếu sản phẩm đã tồn tại, cập nhật số lượng
         state.items[itemIndex].quantity = action.payload.quantity ?? 1;
       } else {
-        // ✅ Nếu sản phẩm chưa tồn tại, thêm sản phẩm mới vào giỏ hàng
         state.items.push({ ...action.payload, quantity: action.payload.quantity ?? 1 });
       }
 
       console.log("📦 Giỏ hàng hiện tại:", state.items);
-      localStorage.setItem("cart", JSON.stringify(state.items));
+      saveCartToStorage(state.items);
     },
 
     removeFromCart: (state, action) => {
@@ -40,16 +57,16 @@ const cartSlice = createSlice({
       );
 
       console.log("🗑️ Xoá sản phẩm có ID:", action.payload);
-      localStorage.setItem("cart", JSON.stringify(state.items));
+      saveCartToStorage(state.items);
     },
 
     clearCart: (state) => {
       state.items = [];
       console.log("🧹 Đã xóa toàn bộ giỏ hàng!");
-      localStorage.removeItem("cart");
+      const cartKey = getCartKey();
+      localStorage.removeItem(cartKey);
     },
 
-    // Cập nhật số lượng sản phẩm
     updateQuantity: (state, action) => {
       const { productId, quantity } = action.payload;
       const itemIndex = state.items.findIndex((item) => item.productId === productId);
@@ -57,11 +74,16 @@ const cartSlice = createSlice({
       if (itemIndex >= 0) {
         state.items[itemIndex].quantity = quantity;
         console.log("🔄 Cập nhật số lượng sản phẩm:", state.items[itemIndex]);
-        localStorage.setItem("cart", JSON.stringify(state.items));
+        saveCartToStorage(state.items);
       }
     },
+
+    // Add new action to load cart for specific user
+    loadUserCart: (state) => {
+      state.items = loadCartFromStorage();
+    }
   },
 });
 
-export const { addToCart, removeFromCart, clearCart, updateQuantity } = cartSlice.actions;
+export const { addToCart, removeFromCart, clearCart, updateQuantity, loadUserCart } = cartSlice.actions;
 export default cartSlice.reducer;

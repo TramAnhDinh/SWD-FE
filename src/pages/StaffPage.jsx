@@ -8,6 +8,8 @@ const StaffPage = () => {
     const { items } = useSelector((state) => state.products);
     const userRole = useSelector((state) => state.auth?.user?.role || "guest");
     const [categories, setCategories] = useState([]);
+    const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+    const [selectedProductId, setSelectedProductId] = useState(null);
 
     const products = Array.isArray(items) ? items : [];
 
@@ -44,8 +46,17 @@ const StaffPage = () => {
     }, [dispatch]);
 
     const handleDelete = async (id) => {
-        await dispatch(deleteProduct(id));
-        dispatch(fetchProducts());
+        setSelectedProductId(id);
+        setShowConfirmDialog(true);
+    };
+
+    const handleConfirmDelete = async () => {
+        if (selectedProductId) {
+            await dispatch(deleteProduct(selectedProductId));
+            dispatch(fetchProducts());
+            setShowConfirmDialog(false);
+            setSelectedProductId(null);
+        }
     };
 
     const openEditModal = (product) => {
@@ -66,17 +77,55 @@ const StaffPage = () => {
         setModalOpen(true);
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
         if (editingProduct) {
-            dispatch(updateProduct(editingProduct));
+            await dispatch(updateProduct(editingProduct));
         } else {
-            dispatch(addProduct(newProduct));
+            await dispatch(addProduct(newProduct));
         }
         setModalOpen(false);
+        dispatch(fetchProducts());
+    };
+
+    const handleInputChange = (value, field) => {
+        if (editingProduct) {
+            setEditingProduct({ ...editingProduct, [field]: value });
+        } else {
+            setNewProduct({ ...newProduct, [field]: value });
+        }
+    };
+
+    // Component xác nhận xóa
+    const DeleteConfirmDialog = () => {
+        if (!showConfirmDialog) return null;
+
+        return (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full mx-4">
+                    <h3 className="text-xl font-bold mb-4">Xác nhận xóa</h3>
+                    <p className="text-gray-600 mb-6">Bạn có chắc chắn muốn xóa sản phẩm này?</p>
+                    <div className="flex justify-end gap-4">
+                        <button
+                            onClick={() => setShowConfirmDialog(false)}
+                            className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+                        >
+                            Hủy
+                        </button>
+                        <button
+                            onClick={handleConfirmDelete}
+                            className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                        >
+                            Xóa
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
     };
 
     return (
         <div className="staff-container">
+            <DeleteConfirmDialog />
             <h2>Quản lý sản phẩm</h2>
             {userRole !== "staff" && (
                 <button className="add-btn" onClick={openAddModal}>Thêm sản phẩm</button>
@@ -103,11 +152,6 @@ const StaffPage = () => {
                                 <td>{product.price} VND</td>
                                 <td>{product.stockInStorage}</td>
                                 <td>
-                                    {/* <img
-                                        src={product.image?.startsWith("http") ? product.image : `https://localhost:7163/uploads/${product.image?.split("\\").pop()}`}
-                                        alt={product.productName}
-                                        className="product-image"
-                                    /> */}
                                     <img
                                         src={product.image && product.image.startsWith("http") 
                                         ? product.image 
@@ -146,11 +190,7 @@ const StaffPage = () => {
                             <input
                                 type="text"
                                 value={editingProduct ? editingProduct.productName : newProduct.productName}
-                                onChange={(e) =>
-                                    editingProduct
-                                        ? setEditingProduct({ ...editingProduct, productName: e.target.value })
-                                        : setNewProduct({ ...newProduct, productName: e.target.value })
-                                }
+                                onChange={(e) => handleInputChange(e.target.value, 'productName')}
                             />
                         </label>
                         <label>
@@ -158,11 +198,7 @@ const StaffPage = () => {
                             <input
                                 type="number"
                                 value={editingProduct ? editingProduct.price : newProduct.price}
-                                onChange={(e) =>
-                                    editingProduct
-                                        ? setEditingProduct({ ...editingProduct, price: e.target.value })
-                                        : setNewProduct({ ...newProduct, price: e.target.value })
-                                }
+                                onChange={(e) => handleInputChange(e.target.value, 'price')}
                             />
                         </label>
                         <label>
@@ -170,11 +206,7 @@ const StaffPage = () => {
                             <input
                                 type="number"
                                 value={editingProduct ? editingProduct.stockInStorage : newProduct.stockInStorage}
-                                onChange={(e) =>
-                                    editingProduct
-                                        ? setEditingProduct({ ...editingProduct, stockInStorage: e.target.value })
-                                        : setNewProduct({ ...newProduct, stockInStorage: e.target.value })
-                                }
+                                onChange={(e) => handleInputChange(e.target.value, 'stockInStorage')}
                             />
                         </label>
                         <label>
@@ -182,33 +214,21 @@ const StaffPage = () => {
                             <input
                                 type="text"
                                 value={editingProduct ? editingProduct.image : newProduct.image}
-                                onChange={(e) =>
-                                    editingProduct
-                                        ? setEditingProduct({ ...editingProduct, image: e.target.value })
-                                        : setNewProduct({ ...newProduct, image: e.target.value })
-                                }
+                                onChange={(e) => handleInputChange(e.target.value, 'image')}
                             />
                         </label>
                         <label>
                             Mô tả:
                             <textarea
                                 value={editingProduct ? editingProduct.description : newProduct.description}
-                                onChange={(e) =>
-                                    editingProduct
-                                        ? setEditingProduct({ ...editingProduct, description: e.target.value })
-                                        : setNewProduct({ ...newProduct, description: e.target.value })
-                                }
+                                onChange={(e) => handleInputChange(e.target.value, 'description')}
                             />
                         </label>
                         <label>
                             Danh mục:
                             <select
                                 value={editingProduct ? editingProduct.categoryId : newProduct.categoryId}
-                                onChange={(e) =>
-                                    editingProduct
-                                        ? setEditingProduct({ ...editingProduct, categoryId: Number(e.target.value) })
-                                        : setNewProduct({ ...newProduct, categoryId: Number(e.target.value) })
-                                }
+                                onChange={(e) => handleInputChange(Number(e.target.value), 'categoryId')}
                             >
                                 {categories.map((category) => (
                                     <option key={category.categoryId} value={category.categoryId}>
@@ -223,7 +243,6 @@ const StaffPage = () => {
                                 <button className="close-btn" onClick={() => setModalOpen(false)}>Đóng</button>
                             </div>
                         </div>
-
                     </div>
                 </div>
             )}

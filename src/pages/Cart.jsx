@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { removeFromCart, clearCart, updateQuantity } from "../redux/slices/cartSlice";
 import { useNavigate } from "react-router-dom";
+import axiosInstance from "../utils/axiosInstance";
 
 const Cart = () => {
   const cartItems = useSelector((state) => state.cart?.items ?? []);
@@ -17,6 +18,12 @@ const Cart = () => {
   const [deliveryAddress, setDeliveryAddress] = useState("");
   const [shippingMethod, setShippingMethod] = useState("Giao thường");
   const [notes, setNotes] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [orderStatus, setOrderStatus] = useState(null);
+  const [showStatus, setShowStatus] = useState(false);
+  const [orderStage, setOrderStage] = useState("Chờ xử lý");
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState("cod");
 
   // Tính phí ship
   const shippingFee = shippingMethod === "Giao nhanh" ? 10000 : 0;
@@ -26,19 +33,13 @@ const Cart = () => {
 
   // Xử lý thay đổi số lượng
   const handleQuantityChange = (productId, newQuantity) => {
-    console.log('Current productId:', productId);
-    console.log('New Quantity:', newQuantity);
-
     if (newQuantity < 1) return;
 
-    setQuantities((prev) => {
-      console.log('Previous quantities:', prev);
-      const newQuantities = { ...prev, [productId]: newQuantity };
-      console.log('New quantities:', newQuantities);
-      return newQuantities;
-    });
+    setQuantities((prev) => ({
+      ...prev,
+      [productId]: newQuantity,
+    }));
 
-    // Cập nhật số lượng trực tiếp trong giỏ hàng
     dispatch(updateQuantity({ productId, quantity: newQuantity }));
   };
 
@@ -54,6 +55,10 @@ const Cart = () => {
       return;
     }
 
+    setIsLoading(true);
+    setOrderStatus("processing");
+    setShowStatus(true);
+
     const orderData = {
       customizeProductId: cartItems[0]?.customizeProductId || 1,
       orderDate: new Date().toISOString(),
@@ -66,66 +71,219 @@ const Cart = () => {
       price: cartItems.reduce((sum, item) => sum + item.price, 0),
       quantity: cartItems.reduce((sum, item) => sum + item.quantity, 0),
       totalPrice,
+      status: orderStage,
+      paymentMethod: paymentMethod
     };
 
     try {
-      const orderResponse = await fetch("https://phamdangtuc-001-site1.ntempurl.com/api/Orders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(orderData),
-      });
+      console.log("Sending order data:", orderData);
+      const response = await axiosInstance.post("/Orders", orderData);
+      console.log("API Response:", response);
+      
+      if (response.data) {
+        console.log("Order created successfully:", response.data);
+        setOrderStatus("success");
+        dispatch(clearCart());
+        
+        // Tạo order stage cho trạng thái đơn hàng
+        const stageData = {
+          orderId: response.data.id || response.data.orderId,
+          orderStageName: orderStage,
+          updatedDate: new Date().toISOString()
+        };
+        
+        try {
+          await axiosInstance.post("/order-stages", stageData);
+          console.log("Order stage created successfully");
 
-      if (!orderResponse.ok) {
-        const errorText = await orderResponse.text();
-        throw new Error(`Lỗi API ${orderResponse.status}: ${errorText}`);
+          // Tạo order stage cho trạng thái thanh toán
+          const paymentStageData = {
+            orderId: response.data.id || response.data.orderId,
+            orderStageName: paymentMethod === "online" ? "Đã thanh toán" : "Chưa thanh toán",
+            updatedDate: new Date().toISOString()
+          };
+          
+          await axiosInstance.post("/order-stages", paymentStageData);
+          console.log("Payment stage created successfully");
+        } catch (stageError) {
+          console.error("Error creating order stages:", stageError);
+        }
+
+        // Hiển thị thông báo thành công trong 2 giây
+        setShowStatus(true);
+        setTimeout(() => {
+          setShowStatus(false);
+          // Sau khi ẩn thông báo, chuyển hướng đến trang member
+          navigate("/member", { 
+            state: { 
+              orderId: response.data.id || response.data.orderId,
+              orderDetails: {
+                recipientName,
+                deliveryAddress,
+                shippingMethod,
+                totalPrice,
+                orderDate: new Date().toLocaleString(),
+                status: orderStage,
+                paymentMethod: paymentMethod,
+                paymentStatus: paymentMethod === "online" ? "Đã thanh toán" : "Chưa thanh toán"
+              }
+            }
+          });
+        }, 2000);
+
+      } else {
+        throw new Error("Không nhận được dữ liệu từ server");
       }
-
-      const orderResult = await orderResponse.json();
-      console.log("Đơn hàng tạo thành công:", orderResult);
-
-      if (!orderResult.orderId) {
-        throw new Error("Lỗi: API không trả về orderId hợp lệ!");
-      }
-
-      await createOrderStage(orderResult.orderId);
-
-      alert("🎉 Đặt hàng thành công!");
-      dispatch(clearCart());
-      navigate("/checkout-confirmation");
     } catch (error) {
-      console.error("Lỗi thanh toán:", error);
-      alert(`Lỗi khi gửi đơn hàng: ${error.message}`);
+      console.error("Error details:", error);
+      setOrderStatus("error");
+      if (error.response) {
+        console.log("Full error response:", error.response);
+        console.log("Error status:", error.response.status);
+        console.log("Error data:", error.response.data);
+        
+        const errorMessage = error.response.data?.message 
+          || error.response.data?.error 
+          || 'Đặt hàng thất bại';
+        alert(`❌ Lỗi: ${errorMessage}`);
+      } else if (error.request) {
+        console.log("Error request:", error.request);
+        alert("❌ Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng!");
+      } else {
+        console.log("Error message:", error.message);
+        alert("❌ Có lỗi xảy ra. Vui lòng thử lại!");
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const createOrderStage = async (orderId) => {
-    const stageData = {
-      orderStageId: 0,
-      orderId: orderId,
-      orderStageName: "Chờ xử lý",
-      updatedDate: new Date().toISOString(),
-    };
-
-    try {
-      const response = await fetch("https://phamdangtuc-001-site1.ntempurl.com/api/order-stages", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(stageData),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Lỗi API ${response.status}: ${errorText}`);
-      }
-
-      console.log("Order Stage tạo thành công:", await response.text());
-    } catch (error) {
-      console.error("Lỗi khi tạo Order Stage:", error);
+  // Thêm hàm xử lý hiển thị modal xác nhận
+  const handleShowConfirm = () => {
+    if (!recipientName || !deliveryAddress || !shippingMethod) {
+      alert("Vui lòng nhập đầy đủ thông tin giao hàng!");
+      return;
     }
+
+    if (cartItems.length === 0) {
+      alert("Giỏ hàng trống!");
+      return;
+    }
+
+    setShowConfirmModal(true);
+  };
+
+  // Component modal xác nhận đơn hàng
+  const ConfirmOrderModal = () => {
+    if (!showConfirmModal) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white p-8 rounded-lg shadow-xl max-w-md w-full mx-4">
+          <h3 className="text-2xl font-bold mb-4">Xác nhận đơn hàng</h3>
+          
+          <div className="space-y-4">
+            <div>
+              <h4 className="font-semibold">Thông tin giao hàng:</h4>
+              <p>Người nhận: {recipientName}</p>
+              <p>Địa chỉ: {deliveryAddress}</p>
+              <p>Phương thức giao hàng: {shippingMethod}</p>
+              <p>Số điện thoại: {notes}</p>
+            </div>
+
+            <div>
+              <h4 className="font-semibold">Chi tiết đơn hàng:</h4>
+              {cartItems.map((item) => (
+                <div key={item.productId} className="flex justify-between py-2">
+                  <span>{item.name} x {item.quantity}</span>
+                  <span>{(item.price * item.quantity).toLocaleString()} VND</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="border-t pt-4">
+              <div className="flex justify-between">
+                <span>Phí ship:</span>
+                <span>{shippingFee.toLocaleString()} VND</span>
+              </div>
+              <div className="flex justify-between font-bold mt-2">
+                <span>Tổng cộng:</span>
+                <span>{totalPrice.toLocaleString()} VND</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-4 mt-6">
+            <button
+              onClick={() => setShowConfirmModal(false)}
+              className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300"
+            >
+              Hủy
+            </button>
+            <button
+              onClick={() => {
+                setShowConfirmModal(false);
+                handleCheckout();
+              }}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            >
+              Xác nhận đặt hàng
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Component hiển thị trạng thái đơn hàng
+  const OrderStatusDisplay = () => {
+    if (!showStatus) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white p-8 rounded-lg shadow-xl max-w-md w-full mx-4">
+          {orderStatus === "processing" && (
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500 mx-auto mb-4"></div>
+              <p className="text-lg font-semibold text-gray-700">Đang xử lý đơn hàng...</p>
+              <p className="text-gray-600 mt-2">Vui lòng chờ trong giây lát</p>
+            </div>
+          )}
+
+          {orderStatus === "success" && (
+            <div className="text-center">
+              <div className="text-green-500 text-6xl mb-4">✓</div>
+              <p className="text-lg font-semibold text-gray-700">Đặt hàng thành công!</p>
+              <p className="text-gray-600 mt-2">Cảm ơn bạn đã đặt hàng</p>
+              <div className="mt-4">
+                <p className="text-sm text-gray-600">Mã đơn hàng: {orderStage}</p>
+                <p className="text-sm text-gray-600">Trạng thái: Chờ xử lý</p>
+              </div>
+            </div>
+          )}
+
+          {orderStatus === "error" && (
+            <div className="text-center">
+              <div className="text-red-500 text-6xl mb-4">✕</div>
+              <p className="text-lg font-semibold text-gray-700">Đặt hàng thất bại</p>
+              <p className="text-gray-600 mt-2">Vui lòng thử lại sau</p>
+              <button
+                onClick={() => setShowStatus(false)}
+                className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
+              >
+                Đóng
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    );
   };
 
   return (
     <div className="max-w-5xl mx-auto py-10 px-6">
+      <OrderStatusDisplay />
+      <ConfirmOrderModal />
       <h2 className="text-3xl font-bold mb-6 text-center">🛒 Giỏ hàng của bạn</h2>
       {cartItems.length === 0 ? (
         <div className="text-center">
@@ -177,13 +335,28 @@ const Cart = () => {
               <p className="text-xl font-bold">Tổng cộng: {totalPrice.toLocaleString()} VND</p>
             </div>
           </div>
-          <div className="flex flex-col gap-4 mt-6">
-            <input type="text" placeholder="Tên người nhận" value={recipientName} onChange={(e) => setRecipientName(e.target.value)} className="border p-2 rounded" />
-            <input type="text" placeholder="Địa chỉ giao hàng" value={deliveryAddress} onChange={(e) => setDeliveryAddress(e.target.value)} className="border p-2 rounded" />
+
+          <div className="bg-white shadow-lg rounded-lg p-6 mt-6">
+            <h3 className="text-xl font-bold mb-4">Thông tin giao hàng</h3>
+            <div className="space-y-4">
+              <input
+                type="text"
+                placeholder="Tên người nhận"
+                value={recipientName}
+                onChange={(e) => setRecipientName(e.target.value)}
+                className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+              <input
+                type="text"
+                placeholder="Địa chỉ giao hàng"
+                value={deliveryAddress}
+                onChange={(e) => setDeliveryAddress(e.target.value)}
+                className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
             <select
               value={shippingMethod}
               onChange={(e) => setShippingMethod(e.target.value)}
-              className="border p-2 rounded"
+                className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="Giao thường">Giao thường</option>
               <option value="Giao nhanh">Giao nhanh (+10,000 VND)</option>
@@ -193,19 +366,63 @@ const Cart = () => {
               value={notes}
               onChange={(e) => {
                 const input = e.target.value;
-                // Allow only digits
                 if (/^\d*$/.test(input)) {
                   setNotes(input);
                 }
               }}
-              className="border p-2 rounded"
-            />
-
-            <div className="flex justify-between items-center">
-              <p className="text-gray-600">Phí ship: {shippingFee.toLocaleString()} VND</p>
-              <p className="text-xl font-bold">Tổng cộng: {totalPrice.toLocaleString()} VND</p>
+                className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Phương thức thanh toán
+                </label>
+                <div className="space-y-2">
+                  <label className="flex items-center space-x-3">
+                    <input
+                      type="radio"
+                      value="cod"
+                      checked={paymentMethod === "cod"}
+                      onChange={(e) => setPaymentMethod(e.target.value)}
+                      className="h-4 w-4 text-blue-600"
+                    />
+                    <span>Thanh toán khi nhận hàng (COD)</span>
+                  </label>
+                  <label className="flex items-center space-x-3">
+                    <input
+                      type="radio"
+                      value="online"
+                      checked={paymentMethod === "online"}
+                      onChange={(e) => setPaymentMethod(e.target.value)}
+                      className="h-4 w-4 text-blue-600"
+                    />
+                    <span>Thanh toán online</span>
+                  </label>
+                </div>
+              </div>
             </div>
-            <button onClick={handleCheckout} className="bg-green-500 text-white py-2 px-6 rounded-lg">Đặt Hàng</button>
+          </div>
+
+          <div className="bg-white shadow-lg rounded-lg p-6 mt-6">
+            <div className="flex justify-between items-center mb-4">
+              <p className="text-gray-600">Phí ship:</p>
+              <p className="font-semibold">{shippingFee.toLocaleString()} VND</p>
+            </div>
+            <div className="flex justify-between items-center mb-6">
+              <p className="text-xl font-bold">Tổng cộng:</p>
+              <p className="text-2xl font-bold text-blue-600">{totalPrice.toLocaleString()} VND</p>
+            </div>
+            <button
+              onClick={handleShowConfirm}
+              disabled={isLoading}
+              className={`w-full py-3 rounded-lg font-semibold transition-colors ${
+                isLoading 
+                  ? "bg-gray-400 cursor-not-allowed" 
+                  : "bg-blue-600 text-white hover:bg-blue-700"
+              }`}
+            >
+              {isLoading ? "Đang xử lý..." : "Đặt Hàng"}
+            </button>
           </div>
         </>
       )}
