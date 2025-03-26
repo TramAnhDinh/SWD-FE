@@ -222,9 +222,9 @@ const Cart = () => {
       shippingMethod,
       shippingFee: 0,
       notes: notes || "",
-      // price: cartItems.reduce((sum, item) => sum + item.price, 0),
+      price: cartItems.reduce((sum, item) => sum + item.price, 0),
       quantity: cartItems.reduce((sum, item) => sum + item.quantity, 0),
-      totalPrice: cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
+      totalPrice,
     };
 
     try {
