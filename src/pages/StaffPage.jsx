@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProducts, deleteProduct, updateProduct, addProduct } from "../redux/slices/productsSlice";
-import "./StaffPage.css";
+import "./staffPage.css";
 
 const StaffPage = () => {
     const dispatch = useDispatch();
