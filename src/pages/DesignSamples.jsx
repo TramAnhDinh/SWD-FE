@@ -100,14 +100,25 @@ const DesignSamples = () => {
           {filteredProducts.length > 0 ? (
             filteredProducts.map((product) => (
               <div
-                key={product.productId}
+                key={product.productId} 
                 className="bg-[#1f1f1f] p-4 rounded-md shadow-md hover:scale-105 transition-transform"
               >
-                <img
-                  src={product.image ? `https://localhost:7163/uploads/${product.image.split("\\").pop()}` : "/placeholder.png"}
+                {/* <img
+                   src={product.image ? `https://localhost:7163/uploads/${product.image.split("\\").pop()}` : "/placeholder.png"}
+                  
                   alt={product.productName}
                   className="w-full h-60 object-cover rounded-md mb-2 hover:opacity-80 transition-opacity"
+                /> */}
+
+                <img
+                   src={product.image && product.image.startsWith("http") 
+                      ? product.image 
+                    : `https://phamdangtuc-001-site1.ntempurl.com/uploads/${product.image ? product.image.split("\\").pop() : "fallback-image.jpg"}`}
+                    alt={product.productName}
+                    className="w-full h-60 object-cover rounded-md mb-2 hover:opacity-80 transition-opacity"
+                    onError={(e) => e.target.src = "/fallback-image.jpg"} 
                 />
+
                 <h3 className="text-center text-xl mb-2">{product.productName}</h3>
                 <p className="text-center text-lg font-semibold mb-2">{product.price.toLocaleString()} VND</p>
                 <button 

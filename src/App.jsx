@@ -83,7 +83,9 @@ const AppContent = () => {
 
           {/* Protected routes for Staff (roleId = 2) */}
           <Route path="/staff" element={<ProtectedRoute allowedRoles={[2]}><StaffPage /></ProtectedRoute>} />
-          <Route path="/order-tracking" element={<ProtectedRoute allowedRoles={[2]}><OrderTracking /></ProtectedRoute>} />
+          <Route path="/order-tracking/" element={<ProtectedRoute allowedRoles={[2]}><OrderTracking /></ProtectedRoute>} />
+           {/* <Route path="/order-tracking/:orderId" element={<ProtectedRoute allowedRoles={[2]}><OrderTracking /></ProtectedRoute>} /> */}
+
 
           {/* Protected routes for Member (roleId = 3) */}
           <Route path="/member" element={<ProtectedRoute allowedRoles={[3]}><MemberPage /></ProtectedRoute>} />

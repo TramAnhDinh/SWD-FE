@@ -244,11 +244,11 @@ const MemberPage = () => {
       return;
     }
 
-    if (!editData.userId || editData.userId === 0 || !editData.username.trim() || !editData.fullName.trim()) {
-      setError("Thiếu dữ liệu bắt buộc! Vui lòng nhập đầy đủ thông tin.");
-      console.log("Dữ liệu trước khi gửi:", editData);
-      return;
-    }
+    // if (!editData.userId || editData.userId === 0 || !editData.username.trim() || !editData.fullName.trim()) {
+    //   setError("Thiếu dữ liệu bắt buộc! Vui lòng nhập đầy đủ thông tin.");
+    //   console.log("Dữ liệu trước khi gửi:", editData);
+    //   return;
+    // }
     
 
     const formattedData = {
@@ -288,7 +288,7 @@ const MemberPage = () => {
         return;
       }
       
-      setProfile(updatedData .data);
+      setProfile(updatedData.data);
       setIsEditing(false);
       alert("Cập nhật thành công!");
     //   setProfile(updatedData.data);

@@ -1,339 +1,159 @@
-// import React from "react";
-// import { useSelector, useDispatch } from "react-redux";
-// import { removeFromCart, clearCart } from "../redux/slices/cartSlice";
-// import { useNavigate } from "react-router-dom";
-
-// const Cart = () => {
-//   const cartItems = useSelector((state) => state.cart?.items ?? []);
-//   const userRole = useSelector((state) => state.auth.user?.role ?? "guest"); // Mặc định là "guest"
-//   // const userRole = useSelector((state) => state.auth.user.role); // Lấy role từ Redux
-//   const dispatch = useDispatch();
-//   const navigate = useNavigate();
-
-//   const totalPrice = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
-
-//   const handleCheckout = () => {
-//     if (userRole && userRole === "staff") {
-//       alert("Nhân viên không được phép mua hàng!");
-//       return;
-//     }
-//     navigate("/checkout-confirmation");
-//   };
-
-//   return (
-//     <div className="max-w-5xl mx-auto py-10 px-6">
-//       <h2 className="text-3xl font-bold mb-6 text-center">🛒 Giỏ hàng của bạn</h2>
-
-//       {cartItems.length === 0 ? (
-//         <div className="text-center">
-//           <p className="text-gray-600 mb-4 text-lg">Giỏ hàng của bạn đang trống.</p>
-//           <button
-//             onClick={() => navigate("/")}
-//             className="bg-blue-600 text-white py-2 px-6 rounded-lg hover:bg-blue-700 transition shadow-md"
-//           >
-//             🛍 Tiếp tục mua sắm
-//           </button>
-//         </div>
-//       ) : (
-//         <>
-//           <div className="bg-white shadow-lg rounded-lg p-6">
-//             <ul>
-//               {cartItems.map((item) => (
-//                 <li key={item.id} className="flex justify-between items-center py-4 border-b">
-//                   <div className="flex items-center gap-4">
-//                     {item.image && (
-//                       <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded-lg shadow" />
-//                     )}
-//                     <div>
-//                       <p className="text-lg font-semibold">
-//                         {item.name} × {item.quantity}
-//                       </p>
-//                       <p className="text-gray-600">{(item.price * item.quantity).toLocaleString()} VND</p>
-//                     </div>
-//                   </div>
-//                   {userRole !== "staff" && ( // Ẩn nút xóa nếu là Staff
-//                     <button
-//                       onClick={() => dispatch(removeFromCart(item.id))}
-//                       className="text-red-500 hover:text-red-700 transition"
-//                     >
-//                       ❌ Xóa
-//                     </button>
-//                   )}
-//                 </li>
-//               ))}
-//             </ul>
-
-//             <div className="mt-6 text-right">
-//               <p className="text-xl font-bold">Tổng cộng: {totalPrice.toLocaleString()} VND</p>
-//             </div>
-//           </div>
-
-//           <div className="flex flex-wrap justify-center gap-4 mt-6">
-//             {userRole !== "staff" && ( // Ẩn nút xóa giỏ hàng nếu là Staff
-//               <button
-//                 onClick={() => dispatch(clearCart())}
-//                 className="bg-red-500 text-white py-2 px-6 rounded-lg hover:bg-red-600 transition shadow-md"
-//               >
-//                 🗑 Xóa hết
-//               </button>
-//             )}
-//             <button
-//               onClick={() => navigate("/")}
-//               className="bg-blue-600 text-white py-2 px-6 rounded-lg hover:bg-blue-700 transition shadow-md"
-//             >
-//               🔄 Tiếp tục mua hàng
-//             </button>
-//             {userRole !== "staff" && ( // Ẩn nút thanh toán nếu là Staff
-//               <button
-//                 onClick={handleCheckout}
-//                 className="bg-green-500 text-white py-2 px-6 rounded-lg hover:bg-green-600 transition shadow-md"
-//               >
-//                 💳 Thanh toán
-//               </button>
-//             )}
-//           </div>
-//         </>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default Cart;
-
-// import { useSelector, useDispatch } from "react-redux";
-// import { useNavigate } from "react-router-dom";
-// import { clearCart } from "../redux/slices/cartSlice";
-// import { useState } from "react";
-
-// const Cart = () => {
-//   const cartItems = useSelector((state) => state.cart.items ?? []);
-//   const userRole = useSelector((state) => state.auth.user?.role ?? "guest");
-//   const dispatch = useDispatch();
-//   const navigate = useNavigate();
-//   const [loading, setLoading] = useState(false);
-
-//   const totalPrice = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
-//   const totalQuantity = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-
-//   const handleCheckout = async () => {
-//     if (userRole && userRole === "staff") {
-//       alert("Nhân viên không được phép mua hàng!");
-//       return;
-//     }
-
-//     if (cartItems.length === 0) {
-//       alert("Giỏ hàng của bạn đang trống!");
-//       return;
-//     }
-
-//     const orderData = {
-//       customizeProductId: 0,
-//       orderDate: new Date().toISOString(),
-//       deliveryDate: new Date().toISOString(),
-//       recipientName: "string",
-//       deliveryAddress: "string",
-//       shippingMethod: "string",
-//       shippingFee: 0,
-//       notes: "string",
-//       price: totalPrice,
-//       quantity: totalQuantity,
-//       totalPrice: totalPrice,
-//     };
-
-//     try {
-//       setLoading(true);
-//       const response = await fetch("https://phamdangtuc-001-site1.ntempurl.com/api/Orders", {
-//         method: "POST",
-//         headers: {
-//           "Content-Type": "application/json",
-//         },
-//         body: JSON.stringify(orderData),
-//       });
-
-//       if (!response.ok) {
-//         throw new Error("Đặt hàng thất bại!");
-//       }
-
-//       alert("Đặt hàng thành công!");
-//       dispatch(clearCart());
-//       navigate("/checkout-confirmation");
-//     } catch (error) {
-//       alert(error.message);
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   return (
-//     <div className="max-w-5xl mx-auto py-10 px-6">
-//       <h2 className="text-3xl font-bold mb-6 text-center">🛒 Giỏ hàng của bạn</h2>
-
-//       {cartItems.length === 0 ? (
-//         <div className="text-center">
-//           <p className="text-gray-600 mb-4 text-lg">Giỏ hàng của bạn đang trống</p>
-//           <button className="bg-blue-500 text-white px-4 py-2 rounded mt-4" onClick={() => navigate("/")}>
-//             🛍️ Tiếp tục mua sắm
-//           </button>
-//         </div>
-//       ) : (
-//         <>
-//           {cartItems.map((item) => (
-//             <div key={item.id} className="flex justify-between items-center p-4 border-b">
-//               <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded" />
-//               <div className="flex-1 px-4">
-//                 <h3 className="text-lg font-semibold">{item.name}</h3>
-//                 <p>{item.quantity} x {item.price.toLocaleString()} VND</p>
-//               </div>
-//               <button className="text-red-500">❌ Xóa</button>
-//             </div>
-//           ))}
-
-//           <div className="text-right text-lg font-semibold mt-4">
-//             Tổng cộng: {totalPrice.toLocaleString()} VND
-//           </div>
-
-//           <div className="flex justify-between mt-6">
-//             <button className="bg-red-500 text-white px-4 py-2 rounded" onClick={() => dispatch(clearCart())}>🗑️ Xóa hết</button>
-//             <button className="bg-blue-500 text-white px-4 py-2 rounded" onClick={() => navigate("/")}>🛍️ Tiếp tục mua sắm</button>
-//             <button className="bg-green-500 text-white px-4 py-2 rounded" onClick={handleCheckout} disabled={loading}>
-//               {loading ? "Đang xử lý..." : "💳 Thanh toán"}
-//             </button>
-//           </div>
-//         </>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default Cart;
-
+import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { removeFromCart, clearCart } from "../redux/slices/cartSlice";
 import { useNavigate } from "react-router-dom";
-import { clearCart, removeFromCart } from "../redux/slices/cartSlice";
-import { useState } from "react";
 
 const Cart = () => {
-  const cartItems = useSelector((state) => state.cart.items ?? []);
-  const userRole = useSelector((state) => state.auth.user?.role ?? "guest");
+  const cartItems = useSelector((state) => state.cart?.items ?? []);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
+
+  cartItems.forEach((item, index) => {
+    console.log(`🛒 Sản phẩm [${index + 1}]`, item);
+});
+
+
+  const [recipientName, setRecipientName] = useState("");
+  const [deliveryAddress, setDeliveryAddress] = useState("");
+  const [shippingMethod, setShippingMethod] = useState("Giao nhanh");
+  const [notes, setNotes] = useState("");
 
   const totalPrice = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
-  const totalQuantity = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   const handleCheckout = async () => {
-    if (userRole && userRole === "staff") {
-      alert("Nhân viên không được phép mua hàng!");
+    if (!recipientName || !deliveryAddress || !shippingMethod) {
+      alert("Vui lòng nhập đầy đủ thông tin giao hàng!");
       return;
     }
 
     if (cartItems.length === 0) {
-      alert("Giỏ hàng của bạn đang trống!");
+      alert("Giỏ hàng trống!");
       return;
     }
+    const invalidItems = cartItems.filter((item) => !item.productId || item.productId <= 0);
+  if (invalidItems.length > 0) {
+    alert("Có sản phẩm không hợp lệ trong giỏ hàng. Vui lòng kiểm tra lại!");
+    console.error("🚨 Sản phẩm không hợp lệ:", invalidItems);
+    return;
+  }
 
-    const orderData = {
-      customizeProductId: 0,
-      orderDate: new Date().toISOString(),
-      deliveryDate: new Date().toISOString(),
-      recipientName: "string",
-      deliveryAddress: "string",
-      shippingMethod: "string",
-      shippingFee: 0,
-      notes: "string",
-      price: totalPrice,
-      quantity: totalQuantity,
-      totalPrice: totalPrice,
+  const orderData = {
+    customizeProductId: cartItems.length > 0 && cartItems[0].customizeProductId ? cartItems[0].customizeProductId : 1,
+    orderDate: new Date().toISOString(),
+    deliveryDate: new Date().toISOString(),
+    recipientName: recipientName, // Thay bằng giá trị thực
+    deliveryAddress: deliveryAddress, // Thay bằng giá trị thực
+    shippingMethod: shippingMethod, // Thay bằng giá trị thực
+    shippingFee: 0,
+    notes: notes || "", // Nếu không có thì để chuỗi rỗng
+    price: cartItems.reduce((sum, item) => sum + item.price, 0), // Tổng giá
+    quantity: cartItems.reduce((sum, item) => sum + item.quantity, 0), // Tổng số lượng
+    totalPrice: cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0), // Tổng tiền
+  };
+  
+  console.log("📦 Dữ liệu gửi lên API:", JSON.stringify(orderData, null, 2));
+  
+
+    // Kiểm tra dữ liệu trước khi gửi API
+console.log("Dữ liệu gửi lên API:", JSON.stringify(orderData, null, 2));
+
+try {
+  console.log("📦 Dữ liệu gửi lên API:", JSON.stringify(orderData, null, 2));
+
+  const orderResponse = await fetch("https://phamdangtuc-001-site1.ntempurl.com/api/Orders", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(orderData),
+  });
+
+  if (!orderResponse.ok) {
+    const errorText = await orderResponse.text();
+    throw new Error(`Lỗi API ${orderResponse.status}: ${errorText}`);
+  }
+
+  const orderResult = await orderResponse.json();
+  console.log("✅ Đơn hàng tạo thành công:", orderResult);
+
+  if (!orderResult.orderId) {
+    throw new Error("Lỗi: API không trả về orderId hợp lệ!");
+  }
+
+  await createOrderStage(orderResult.orderId);
+
+  alert("🎉 Đặt hàng thành công!");
+  dispatch(clearCart());
+  navigate("/checkout-confirmation");
+} catch (error) {
+  console.error("❌ Lỗi thanh toán:", error);
+  alert(`Lỗi khi gửi đơn hàng: ${error.message}`);
+}
+  };
+
+  const createOrderStage = async (orderId) => {
+    const stageData = {
+      orderStageId: 0,
+      orderId: orderId,
+      orderStageName: "Place Order",
+      updatedDate: new Date().toISOString(),
     };
 
     try {
-      setLoading(true);
-      const response = await fetch("https://phamdangtuc-001-site1.ntempurl.com/api/Orders", {
+      const response = await fetch("https://phamdangtuc-001-site1.ntempurl.com/api/order-stages", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(orderData),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(stageData),
       });
 
+      const responseText = await response.text();
       if (!response.ok) {
-        throw new Error("Đặt hàng thất bại!");
+        throw new Error(`Lỗi API ${response.status}: ${responseText}`);
       }
 
-      alert("Đặt hàng thành công!");
-      dispatch(clearCart());
-      navigate("/checkout-confirmation");
+      console.log("✅ Order Stage tạo thành công:", responseText);
     } catch (error) {
-      alert(error.message);
-    } finally {
-      setLoading(false);
+      console.error("❌ Lỗi khi tạo Order Stage:", error);
     }
   };
+  console.log("Cart Items Debug:", cartItems);
 
   return (
     <div className="max-w-5xl mx-auto py-10 px-6">
       <h2 className="text-3xl font-bold mb-6 text-center">🛒 Giỏ hàng của bạn</h2>
-
       {cartItems.length === 0 ? (
         <div className="text-center">
-          <p className="text-gray-600 mb-4 text-lg">Giỏ hàng của bạn đang trống</p>
-          <button className="bg-blue-500 text-white px-4 py-2 rounded mt-4" onClick={() => navigate("/")}>
-            🛍️ Tiếp tục mua sắm
+          <p className="text-gray-600 mb-4 text-lg">Giỏ hàng của bạn đang trống.</p>
+          <button onClick={() => navigate("/")} className="bg-blue-600 text-white py-2 px-6 rounded-lg">
+            🛍 Tiếp tục mua sắm
           </button>
         </div>
       ) : (
         <>
-          {cartItems.map((item) => (
-            <div key={item.id} className="flex justify-between items-center p-4 border-b">
-              {/* <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded" />
-               */}
-               <img 
-                    src={item.image?.startsWith("http") ? item.image : `https://localhost:7163/uploads/${item.image?.split("\\").pop()}`} 
-                    alt={item.name} 
-                    className="w-16 h-16 object-cover rounded"
-                    onError={(e) => e.target.src = "/fallback-image.jpg"} 
-              />
-
-              <div className="flex-1 px-4">
-                <h3 className="text-lg font-semibold">{item.name}</h3>
-                <p>{item.quantity} x {item.price.toLocaleString()} VND</p>
-              </div>
-              {/* <button className="text-red-500" onClick={() => dispatch(removeFromCart(item.id))}>
-                ❌ Xóa
-              </button> */}
-             <button
-                className="text-red-500"
-                onClick={() => {
-                console.log("🛠️ Xóa sản phẩm:", item);
-                console.log("🔍 ID sản phẩm:", item.productId || item.$id); // Test xem ID nào đúng
-
-                const itemId = item.productId || item.$id; // Chọn ID phù hợp
-                if (!itemId) {
-                console.error("❌ Lỗi: item.id bị undefined hoặc null!");
-                return;
-                }
-
-                dispatch(removeFromCart(itemId));
-                }}
-              >
-                ❌ Xóa
-            </button>
-
-
+          <div className="bg-white shadow-lg rounded-lg p-6">
+            <ul>
+              {cartItems.map((item) => (
+                <li key={item.productId} className="flex justify-between items-center py-4 border-b">
+                  <div className="flex items-center gap-4">
+                    {item.image && <img src={item.image} alt={item.name} className="w-16 h-16 object-cover" />}
+                    <div>
+                      <p className="text-lg font-semibold">{item.name} × {item.quantity}</p>
+                      <p className="text-gray-600">{(item.price * item.quantity).toLocaleString()} VND</p>
+                    </div>
+                  </div>
+                  <button className="text-red-500" onClick={() => dispatch(removeFromCart(item.productId))}>
+                    ❌ Xóa
+                  </button>
+                </li>
+              ))}
+            </ul>
+            <div className="mt-6 text-right">
+              <p className="text-xl font-bold">Tổng cộng: {totalPrice.toLocaleString()} VND</p>
             </div>
-          ))}
-
-          <div className="text-right text-lg font-semibold mt-4">
-            Tổng cộng: {totalPrice.toLocaleString()} VND
           </div>
-
-          <div className="flex justify-between mt-6">
-            <button className="bg-red-500 text-white px-4 py-2 rounded" onClick={() => dispatch(clearCart())}>🗑️ Xóa hết</button>
-            <button className="bg-blue-500 text-white px-4 py-2 rounded" onClick={() => navigate("/")}>🛍️ Tiếp tục mua sắm</button>
-            <button className="bg-green-500 text-white px-4 py-2 rounded" onClick={handleCheckout} disabled={loading}>
-              {loading ? "Đang xử lý..." : "💳 Thanh toán"}
-            </button>
+          <div className="flex flex-col gap-4 mt-6">
+            <input type="text" placeholder="Tên người nhận" value={recipientName} onChange={(e) => setRecipientName(e.target.value)} className="border p-2 rounded" />
+            <input type="text" placeholder="Địa chỉ giao hàng" value={deliveryAddress} onChange={(e) => setDeliveryAddress(e.target.value)} className="border p-2 rounded" />
+            <textarea placeholder="Ghi chú" value={notes} onChange={(e) => setNotes(e.target.value)} className="border p-2 rounded"></textarea>
+            <button onClick={handleCheckout} className="bg-green-500 text-white py-2 px-6 rounded-lg">Đặt Hàng</button>
           </div>
         </>
       )}
@@ -342,3 +162,4 @@ const Cart = () => {
 };
 
 export default Cart;
+
