@@ -72,7 +72,7 @@ try {
   }
 
   const orderResult = await orderResponse.json();
-  console.log("✅ Đơn hàng tạo thành công:", orderResult);
+  console.log("Đơn hàng tạo thành công:", orderResult);
 
   if (!orderResult.orderId) {
     throw new Error("Lỗi: API không trả về orderId hợp lệ!");
@@ -84,7 +84,7 @@ try {
   dispatch(clearCart());
   navigate("/checkout-confirmation");
 } catch (error) {
-  console.error("❌ Lỗi thanh toán:", error);
+  console.error("Lỗi thanh toán:", error);
   alert(`Lỗi khi gửi đơn hàng: ${error.message}`);
 }
   };
@@ -109,9 +109,9 @@ try {
         throw new Error(`Lỗi API ${response.status}: ${responseText}`);
       }
 
-      console.log("✅ Order Stage tạo thành công:", responseText);
+      console.log("Order Stage tạo thành công:", responseText);
     } catch (error) {
-      console.error("❌ Lỗi khi tạo Order Stage:", error);
+      console.error("Lỗi khi tạo Order Stage:", error);
     }
   };
   console.log("Cart Items Debug:", cartItems);

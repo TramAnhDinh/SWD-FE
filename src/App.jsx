@@ -80,6 +80,7 @@ const AppContent = () => {
           <Route path="/blog/class/:id" element={<NewsDetail />} />
           <Route path="/blog/b" element={<HandPage />} />
           <Route path="/blog/b/:id" element={<HandDetail />} />
+          {/* <Route path="/order-detail" element={<OrderDetail />} /> */}
 
           {/* Protected routes for Staff (roleId = 2) */}
           <Route path="/staff" element={<ProtectedRoute allowedRoles={[2]}><StaffPage /></ProtectedRoute>} />
