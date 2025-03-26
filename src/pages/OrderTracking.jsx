@@ -106,8 +106,9 @@ const OrderTracking = () => {
         return "bg-purple-100 text-purple-800 border-purple-200";
       case "Hoàn thành":
         return "bg-green-100 text-green-800 border-green-200";
-      case "Đã thanh toán":
-        return "bg-green-100 text-green-800 border-green-200";
+        case "Purchased":
+          return "bg-green-500 text-white border-green-600 shadow-lg transform scale-105 transition-transform hover:scale-110";
+        
       case "Chưa thanh toán":
         return "bg-yellow-100 text-yellow-800 border-yellow-200";
       default:
@@ -275,7 +276,7 @@ const OrderTracking = () => {
           {orders.length > 0 ? (
             <>
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
+                <table className="min-w-full border-collapse border border-gray-300 divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
@@ -288,9 +289,9 @@ const OrderTracking = () => {
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tổng Tiền</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Số điện thoại</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái đơn</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái thanh toán</th>
+                      {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái thanh toán</th> */}
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cập nhật</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Chi Tiết</th>
+                      {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Chi Tiết</th> */}
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
@@ -310,11 +311,11 @@ const OrderTracking = () => {
                             {getOrderStage(order.orderId)}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        {/* <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getStageStyle(getPaymentStage(order.orderId))}`}>
                             {getPaymentStage(order.orderId)}
                           </span>
-                        </td>
+                        </td> */}
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center gap-2">
                             <select
@@ -341,14 +342,14 @@ const OrderTracking = () => {
                             )}
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        {/* <td className="px-6 py-4 whitespace-nowrap">
                           <button 
                             className="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                             onClick={() => navigate(`/order-detail/${order.orderId}`)}
                           >
                             Chi tiết
                           </button>
-                        </td>
+                        </td> */}
                       </tr>
                     ))}
                   </tbody>
