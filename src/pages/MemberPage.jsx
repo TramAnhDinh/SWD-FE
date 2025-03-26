@@ -175,7 +175,7 @@
 // export default MemberPage;
 
 import React, { useEffect, useState } from "react";
-import "./MemberPage.css"; // Import CSS
+import "./memberPage.css"; // Import CSS
 
 const MemberPage = () => {
   const [profile, setProfile] = useState(null);
