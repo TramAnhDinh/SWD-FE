@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProducts, deleteProduct, updateProduct, addProduct } from "../redux/slices/productsSlice";
-import "./staffPage.css";
 import { ToastContainer, toast } from 'react-toastify';
+import { FaEdit, FaTrash, FaPlus, FaSearch } from 'react-icons/fa';
 import 'react-toastify/dist/ReactToastify.css';
-
 
 const StaffPage = () => {
     const dispatch = useDispatch();
@@ -14,12 +13,7 @@ const StaffPage = () => {
     const [showConfirmDialog, setShowConfirmDialog] = useState(false);
     const [selectedProductId, setSelectedProductId] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
-
-    const products = Array.isArray(items) ? items : [];
-    const filteredProducts = products.filter(product =>
-        product.productName?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
+    const [selectedCategory, setSelectedCategory] = useState("all");
     const [isModalOpen, setModalOpen] = useState(false);
     const [editingProduct, setEditingProduct] = useState(null);
     const [newProduct, setNewProduct] = useState({
@@ -31,7 +25,13 @@ const StaffPage = () => {
         categoryId: 1
     });
 
-    // Fetch categories từ API
+    const products = Array.isArray(items) ? items : [];
+    const filteredProducts = products.filter(product => {
+        const matchesSearch = product.productName?.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesCategory = selectedCategory === "all" || product.categoryId === Number(selectedCategory);
+        return matchesSearch && matchesCategory;
+    });
+
     useEffect(() => {
         const fetchCategories = async () => {
             try {
@@ -64,19 +64,16 @@ const StaffPage = () => {
             toast.success("Xóa sản phẩm thành công!", { autoClose: 3000 });
             setShowConfirmDialog(false);
             setSelectedProductId(null);
-            console.log("isModalOpen sau khi mở Edit Modal:", isModalOpen);
         }
     };
 
     const openEditModal = (product) => {
-        console.log("Mở modal chỉnh sửa", product);
         toast.info(`Chỉnh sửa sản phẩm: ${product.productName}`, { autoClose: 2000 });
         setEditingProduct({ ...product });
         setModalOpen(true);
     };
 
     const openAddModal = () => {
-        console.log("Mở modal thêm sản phẩm");
         toast.success("Mở modal thêm sản phẩm!", { autoClose: 2000 });
         setEditingProduct(null);
         setNewProduct({
@@ -88,11 +85,9 @@ const StaffPage = () => {
             categoryId: categories[0]?.categoryId || 1
         });
         setModalOpen(true);
-        console.log("isModalOpen sau khi mở Add Modal:", isModalOpen);
     };
 
     const handleSave = async () => {
-        console.log("Lưu sản phẩm:", editingProduct || newProduct);
         if (editingProduct) {
             await dispatch(updateProduct(editingProduct));
             toast.success("Cập nhật sản phẩm thành công!", { autoClose: 2000 });
@@ -100,13 +95,11 @@ const StaffPage = () => {
             await dispatch(addProduct(newProduct));
             toast.success("Thêm sản phẩm mới thành công!", { autoClose: 2000 });
         }
-        // toast.error("Có lỗi xảy ra khi lưu sản phẩm!", { autoClose: 3000 });
         setModalOpen(false);
         dispatch(fetchProducts());
     };
 
     const handleInputChange = (value, field) => {
-        console.log(`Thay đổi: ${field} =`, value, "Trạng thái hiện tại:", editingProduct || newProduct);
         if (editingProduct) {
             setEditingProduct({ ...editingProduct, [field]: value });
         } else {
@@ -114,7 +107,6 @@ const StaffPage = () => {
         }
     };
 
-    // Component xác nhận xóa
     const DeleteConfirmDialog = () => {
         if (!showConfirmDialog) return null;
 
@@ -143,153 +135,222 @@ const StaffPage = () => {
     };
 
     return (
-        <div className="staff-container">
-             <ToastContainer position="top-right" autoClose={3000}/> {/* Thêm dòng này để hiển thị thông báo */}
+        <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+            <ToastContainer position="top-right" autoClose={3000}/>
             <DeleteConfirmDialog />
-            <h2>Quản lý sản phẩm</h2>
-            {/* Ô tìm kiếm */}
-            <input
-                type="text"
-                placeholder="Tìm kiếm sản phẩm..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="search-input"
-            />
+            
+            <div className="max-w-7xl mx-auto">
+                <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+                    <div className="px-6 py-4 border-b border-gray-200">
+                        <h1 className="text-2xl font-bold text-gray-900">📦 Quản Lý Sản Phẩm</h1>
+                    </div>
 
-            {userRole !== "staff" && (
-                <button className="add-btn" onClick={openAddModal}>Thêm sản phẩm</button>
-                
-            )}
-            <table className="product-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Hình ảnh</th>
-                        <th>Tên sản phẩm</th>
-                        <th>Giá</th>
-                        <th>Tồn kho</th>                       
-                        <th>Mô tả</th>
-                        <th>Danh mục</th>
-                        {userRole !== "staff" && <th>Hành động</th>}
-                    </tr>
-                </thead>
-                <tbody>
-                    {filteredProducts.length > 0 ? (
-                        filteredProducts.map((product) => (
-                            <tr key={product.productId}>
-                                <td>{product.productId}</td>
-                                <td>
-                                    <img
-                                        src={product.image && product.image.startsWith("http") 
-                                        ? product.image 
-                                         : `https://phamdangtuc-001-site1.ntempurl.com/uploads/${product.image ? product.image.split("\\").pop() : "fallback-image.jpg"}`}
-                                        alt={product.productName}
-                                        className="w-32 h-32 object-cover rounded-md mb-2 hover:opacity-80 transition-opacity"
-                                         onError={(e) => e.target.src = "/fallback-image.jpg"} 
+                    <div className="p-6">
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                                <div className="relative flex-1 max-w-md">
+                                    <input
+                                        type="text"
+                                        placeholder="Tìm kiếm sản phẩm..."
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     />
-                                </td>
-                                <td>{product.productName}</td>
-                                <td>{product.price.toLocaleString('vi-vn')} VND</td>
-                                <td>{product.stockInStorage}</td>                        
-                                <td>{product.description}</td>
-                                <td>
-                                    {categories.find(cat => cat.categoryId === product.categoryId)?.categoryName || 'Chưa phân loại'}
-                                </td>
-                                {userRole !== "staff" && (
-                                    <td>
-                                        <button onClick={() => openEditModal(product)} className="edit-btn">Sửa</button>
-                                        <button onClick={() => handleDelete(product.productId)} className="delete-btn">Xóa</button>
-                                    </td>
-                                )}
-                            </tr>
-                        ))
-                    ) : (
-                        <tr>
-                            <td colSpan="8">Không có sản phẩm nào</td>
-                        </tr>
-                    )}
-                </tbody>
-            </table>
+                                    <FaSearch className="absolute left-3 top-3 text-gray-400" />
+                                </div>
+                                <select
+                                    value={selectedCategory}
+                                    onChange={(e) => setSelectedCategory(e.target.value)}
+                                    className="w-full sm:w-48 px-3 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                >
+                                    <option value="all">Tất cả danh mục</option>
+                                    {categories.map((category) => (
+                                        <option key={category.categoryId} value={category.categoryId}>
+                                            {category.categoryName}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            {userRole !== "staff" && (
+                                <button
+                                    onClick={openAddModal}
+                                    className="w-full sm:w-auto bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2"
+                                >
+                                    <FaPlus />
+                                    Thêm sản phẩm
+                                </button>
+                            )}
+                        </div>
+
+                        <div className="overflow-x-auto">
+                            <table className="min-w-full divide-y divide-gray-200">
+                                <thead className="bg-gray-50">
+                                    <tr>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hình ảnh</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tên sản phẩm</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Giá</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tồn kho</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mô tả</th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Danh mục</th>
+                                        {userRole !== "staff" && (
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hành động</th>
+                                        )}
+                                    </tr>
+                                </thead>
+                                <tbody className="bg-white divide-y divide-gray-200">
+                                    {filteredProducts.length > 0 ? (
+                                        filteredProducts.map((product) => (
+                                            <tr key={product.productId} className="hover:bg-gray-50">
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{product.productId}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <img
+                                                        src={product.image && product.image.startsWith("http") 
+                                                            ? product.image 
+                                                            : `https://phamdangtuc-001-site1.ntempurl.com/uploads/${product.image ? product.image.split("\\").pop() : "fallback-image.jpg"}`}
+                                                        alt={product.productName}
+                                                        className="w-20 h-20 object-cover rounded-lg"
+                                                        onError={(e) => e.target.src = "/fallback-image.jpg"}
+                                                    />
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{product.productName}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{product.price.toLocaleString('vi-vn')} VND</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{product.stockInStorage}</td>
+                                                <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">{product.description}</td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                                    {categories.find(cat => cat.categoryId === product.categoryId)?.categoryName || 'Chưa phân loại'}
+                                                </td>
+                                                {userRole !== "staff" && (
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                        <div className="flex items-center gap-2">
+                                                            <button
+                                                                onClick={() => openEditModal(product)}
+                                                                className="text-blue-600 hover:text-blue-900"
+                                                            >
+                                                                <FaEdit className="w-5 h-5" />
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleDelete(product.productId)}
+                                                                className="text-red-600 hover:text-red-900"
+                                                            >
+                                                                <FaTrash className="w-5 h-5" />
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                )}
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan="8" className="px-6 py-4 text-center text-gray-500">
+                                                Không có sản phẩm nào
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             {isModalOpen && (
-                <div className="modal">
-                    <div className="modal-content">
-                        <h3>{editingProduct ? "Sửa sản phẩm" : "Thêm sản phẩm"}</h3>
-                        <div class="modal-body">
-                        <label >
-                            Tên sản phẩm:
-                            <input
-                                type="text"
-                                value={editingProduct ? editingProduct.productName : newProduct.productName}
-                                onChange={(e) => handleInputChange(e.target.value, 'productName')}
-                            />
-                        </label>
-                        </div>
-                        <div class="row">
-                        <div class="form-group half">
-                        <label>
-                            Giá:
-                            <input
-                                type="number"
-                                value={editingProduct ? editingProduct.price : newProduct.price}
-                                onChange={(e) => handleInputChange(e.target.value, 'price')}
-                            />
-                        </label>
-                        </div>
-                        <div class="form-group half">
-                        <label>
-                            Tồn kho:
-                            <input
-                                type="number"
-                                value={editingProduct ? editingProduct.stockInStorage : newProduct.stockInStorage}
-                                onChange={(e) => handleInputChange(e.target.value, 'stockInStorage')}
-                            />
-                        </label>
-                        </div>
-                        </div>
-
-                        <div class="form-group">
-                        <label>
-                            Ảnh:
-                            <input
-                                type="text"
-                                value={editingProduct ? editingProduct.image : newProduct.image}
-                                onChange={(e) => handleInputChange(e.target.value, 'image')}
-                            />
-                        </label>
-                        </div>
-
-                        <div class="form-group">
-                        <label>
-                            Mô tả:
-                            <textarea
-                                value={editingProduct ? editingProduct.description : newProduct.description}
-                                onChange={(e) => handleInputChange(e.target.value, 'description')}
-                            />
-                        </label>
-                        </div>
-
-                        <div class="form-group">
-                        <label>
-                            Danh mục:
-                            <select
-                                value={editingProduct ? editingProduct.categoryId : newProduct.categoryId}
-                                onChange={(e) => handleInputChange(Number(e.target.value), 'categoryId')}
-                            >
-                                {categories.map((category) => (
-                                    <option key={category.categoryId} value={category.categoryId}>
-                                        {category.categoryName}
-                                    </option>
-                                ))}
-                            </select>
-                        </label>
-                        </div>
-
-                        <div className="button-container">
-                            <button className="save-btn" onClick={handleSave}>Lưu</button>
-                            <div className="close-btn-container">
-                                <button className="close-btn" onClick={() => setModalOpen(false)}>Đóng</button>
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 p-6">
+                        <h3 className="text-xl font-bold mb-4">{editingProduct ? "Sửa sản phẩm" : "Thêm sản phẩm"}</h3>
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Tên sản phẩm
+                                </label>
+                                <input
+                                    type="text"
+                                    value={editingProduct ? editingProduct.productName : newProduct.productName}
+                                    onChange={(e) => handleInputChange(e.target.value, 'productName')}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
                             </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Giá
+                                    </label>
+                                    <input
+                                        type="number"
+                                        value={editingProduct ? editingProduct.price : newProduct.price}
+                                        onChange={(e) => handleInputChange(e.target.value, 'price')}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Tồn kho
+                                    </label>
+                                    <input
+                                        type="number"
+                                        value={editingProduct ? editingProduct.stockInStorage : newProduct.stockInStorage}
+                                        onChange={(e) => handleInputChange(e.target.value, 'stockInStorage')}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Ảnh
+                                </label>
+                                <input
+                                    type="text"
+                                    value={editingProduct ? editingProduct.image : newProduct.image}
+                                    onChange={(e) => handleInputChange(e.target.value, 'image')}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Mô tả
+                                </label>
+                                <textarea
+                                    value={editingProduct ? editingProduct.description : newProduct.description}
+                                    onChange={(e) => handleInputChange(e.target.value, 'description')}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    rows="3"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Danh mục
+                                </label>
+                                <select
+                                    value={editingProduct ? editingProduct.categoryId : newProduct.categoryId}
+                                    onChange={(e) => handleInputChange(Number(e.target.value), 'categoryId')}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                >
+                                    {categories.map((category) => (
+                                        <option key={category.categoryId} value={category.categoryId}>
+                                            {category.categoryName}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div className="mt-6 flex justify-end gap-4">
+                            <button
+                                onClick={() => setModalOpen(false)}
+                                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+                            >
+                                Đóng
+                            </button>
+                            <button
+                                onClick={handleSave}
+                                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                            >
+                                Lưu
+                            </button>
                         </div>
                     </div>
                 </div>

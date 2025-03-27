@@ -37,8 +37,12 @@ const OrderTracking = () => {
     try {
       const response = await axiosInstance.get("/Orders");
       if (response.data?.$values) {
-        console.log("Orders data:", response.data.$values);
-        setOrders(response.data.$values);
+        // Sắp xếp đơn hàng theo thời gian mới nhất
+        const sortedOrders = response.data.$values.sort((a, b) => {
+          return new Date(b.orderDate) - new Date(a.orderDate);
+        });
+        console.log("Orders data:", sortedOrders);
+        setOrders(sortedOrders);
       } else {
         console.error("Dữ liệu không hợp lệ!");
       }

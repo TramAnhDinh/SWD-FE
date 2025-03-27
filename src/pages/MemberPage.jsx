@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import "./memberPage.css";
 import axiosInstance from "../utils/axiosInstance";
+import { FaUser, FaEnvelope, FaPhone, FaCalendar, FaVenusMars, FaMapMarkerAlt, FaEdit, FaTimes } from 'react-icons/fa';
 
 const MemberPage = () => {
   const [profile, setProfile] = useState(null);
@@ -158,18 +158,30 @@ const MemberPage = () => {
     }
   };
 
-  if (loading) return <p className="text-center text-gray-600">Đang tải dữ liệu...</p>;
-  if (error) return <p className="text-center text-red-500">Lỗi: {error}</p>;
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+    </div>
+  );
+  
+  if (error) return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="text-center">
+        <div className="text-red-500 text-xl mb-4">⚠️</div>
+        <p className="text-red-600 font-medium">{error}</p>
+      </div>
+    </div>
+  );
 
   return (
-    <div className="min-h-screen bg-gray-100 py-8">
+    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         <div className="bg-white shadow-lg rounded-xl overflow-hidden mb-6">
           <div className="flex border-b">
             <button
-              className={`flex-1 py-4 px-6 text-center font-medium ${
+              className={`flex-1 py-4 px-6 text-center font-medium transition-colors duration-200 ${
                 activeTab === "profile"
-                  ? "text-blue-600 border-b-2 border-blue-600"
+                  ? "text-indigo-600 border-b-2 border-indigo-600"
                   : "text-gray-500 hover:text-gray-700"
               }`}
               onClick={() => setActiveTab("profile")}
@@ -177,9 +189,9 @@ const MemberPage = () => {
               Thông tin cá nhân
             </button>
             <button
-              className={`flex-1 py-4 px-6 text-center font-medium ${
+              className={`flex-1 py-4 px-6 text-center font-medium transition-colors duration-200 ${
                 activeTab === "orders"
-                  ? "text-blue-600 border-b-2 border-blue-600"
+                  ? "text-indigo-600 border-b-2 border-indigo-600"
                   : "text-gray-500 hover:text-gray-700"
               }`}
               onClick={() => setActiveTab("orders")}
@@ -191,72 +203,151 @@ const MemberPage = () => {
 
         {activeTab === "profile" ? (
           <div className="bg-white shadow-lg rounded-xl p-6">
-            <h2 className="text-2xl font-bold text-gray-800 text-center mb-4">Thông tin cá nhân</h2>
+            <h2 className="text-2xl font-bold text-gray-800 text-center mb-6">Thông tin cá nhân</h2>
             {isEditing ? (
               <div className="space-y-4">
                 {[
-                  { label: "Họ và tên", name: "fullName", type: "text" },
-                  { label: "Email", name: "email", type: "email" },
-                  { label: "Số điện thoại", name: "phone", type: "text" },
-                  { label: "Ngày sinh", name: "dateOfBirth", type: "date" }
-                ].map(({ label, name, type }) => (
-                  <div key={name}>
-                    <label className="block text-sm font-medium text-gray-700">{label}</label>
+                  { label: "Họ và tên", name: "fullName", type: "text", icon: FaUser },
+                  { label: "Email", name: "email", type: "email", icon: FaEnvelope },
+                  { label: "Số điện thoại", name: "phone", type: "text", icon: FaPhone },
+                  { label: "Ngày sinh", name: "dateOfBirth", type: "date", icon: FaCalendar }
+                ].map(({ label, name, type, icon: Icon }) => (
+                  <div key={name} className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Icon className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
                     <input 
                       type={type}
                       name={name}
                       value={editData[name] || ""}
                       onChange={handleChange}
-                      className="w-full mt-1 px-3 py-2 border rounded-lg focus:ring focus:ring-indigo-200" 
+                      className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 transition-colors duration-200 font-sans text-base text-center" 
                     />
                   </div>
                 ))}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Giới tính</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <FaVenusMars className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Giới tính</label>
                   <select 
                     name="gender" 
                     value={editData.gender} 
                     onChange={handleChange} 
-                    className="w-full mt-1 px-3 py-2 border rounded-lg focus:ring focus:ring-indigo-200"
+                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 transition-colors duration-200 font-sans text-base text-center"
                   >
                     <option value="true">Nam</option>
                     <option value="false">Nữ</option>
                   </select>
                 </div>
-                <div className="flex justify-between">
-                  <button onClick={handleSave} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Lưu</button>
-                  <button onClick={() => setIsEditing(false)} className="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg">Hủy</button>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <FaMapMarkerAlt className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Địa chỉ</label>
+                  <input 
+                    type="text"
+                    name="address"
+                    value={editData.address || ""}
+                    onChange={handleChange}
+                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 transition-colors duration-200 font-sans text-base text-center"
+                  />
+                </div>
+                <div className="flex justify-end space-x-3 mt-6">
+                  <button 
+                    onClick={() => setIsEditing(false)} 
+                    className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200 font-sans text-sm"
+                  >
+                    <FaTimes className="inline-block mr-2" />
+                    Hủy
+                  </button>
+                  <button 
+                    onClick={handleSave} 
+                    className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200 font-sans text-sm"
+                  >
+                    <FaEdit className="inline-block mr-2" />
+                    Lưu
+                  </button>
                 </div>
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {profile && (
                   <>
-                    <p><strong>Họ và tên:</strong> {profile.fullName}</p>
-                    <p><strong>Email:</strong> {profile.email}</p>
-                    <p><strong>Số điện thoại:</strong> {profile.phone}</p>
-                    <p><strong>Giới tính:</strong> {profile.gender ? "Nam" : "Nữ"}</p>
+                    <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                      <FaUser className="h-5 w-5 text-gray-400" />
+                      <div>
+                        <p className="text-sm text-gray-500">Họ và tên</p>
+                        <p className="font-medium text-gray-900">{profile.fullName}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                      <FaEnvelope className="h-5 w-5 text-gray-400" />
+                      <div>
+                        <p className="text-sm text-gray-500">Email</p>
+                        <p className="font-medium text-gray-900">{profile.email}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                      <FaPhone className="h-5 w-5 text-gray-400" />
+                      <div>
+                        <p className="text-sm text-gray-500">Số điện thoại</p>
+                        <p className="font-medium text-gray-900">{profile.phone}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                      <FaCalendar className="h-5 w-5 text-gray-400" />
+                      <div>
+                        <p className="text-sm text-gray-500">Ngày sinh</p>
+                        <p className="font-medium text-gray-900">
+                          {profile.dateOfBirth ? new Date(profile.dateOfBirth).toLocaleDateString('vi-VN') : 'Chưa cập nhật'}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                      <FaVenusMars className="h-5 w-5 text-gray-400" />
+                      <div>
+                        <p className="text-sm text-gray-500">Giới tính</p>
+                        <p className="font-medium text-gray-900">{profile.gender ? "Nam" : "Nữ"}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                      <FaMapMarkerAlt className="h-5 w-5 text-gray-400" />
+                      <div>
+                        <p className="text-sm text-gray-500">Địa chỉ</p>
+                        <p className="font-medium text-gray-900">{profile.address}</p>
+                      </div>
+                    </div>
                   </>
                 )}
-                <button onClick={() => setIsEditing(true)} className="mt-4 w-full px-4 py-2 bg-indigo-600 text-white rounded-lg">
-                  Chỉnh sửa
+                <button 
+                  onClick={() => setIsEditing(true)} 
+                  className="w-full mt-6 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
+                >
+                  <FaEdit className="inline-block mr-2" />
+                  Chỉnh sửa thông tin
                 </button>
               </div>
             )}
           </div>
         ) : (
           <div className="bg-white shadow-lg rounded-xl p-6">
-            <h2 className="text-2xl font-bold text-gray-800 text-center mb-4">Lịch sử đơn hàng</h2>
+            <h2 className="text-2xl font-bold text-gray-800 text-center mb-6">Lịch sử đơn hàng</h2>
             {ordersLoading ? (
-              <div className="text-center py-4">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
-                <p className="mt-2 text-gray-600">Đang tải đơn hàng...</p>
+              <div className="text-center py-8">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+                <p className="mt-4 text-gray-600">Đang tải đơn hàng...</p>
               </div>
             ) : ordersError ? (
-              <div className="text-center py-4 text-red-500">{ordersError}</div>
+              <div className="text-center py-8">
+                <div className="text-red-500 text-xl mb-4">⚠️</div>
+                <p className="text-red-600 font-medium">{ordersError}</p>
+              </div>
             ) : orders.length === 0 ? (
-              <div className="text-center py-4 text-gray-600">
-                Bạn chưa có đơn hàng nào
+              <div className="text-center py-8">
+                <div className="text-gray-400 text-xl mb-4">📦</div>
+                <p className="text-gray-600">Bạn chưa có đơn hàng nào</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
@@ -285,20 +376,20 @@ const MemberPage = () => {
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {orders.map((order) => (
-                      <tr key={order.orderId}>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {order.orderId}
+                      <tr key={order.orderId} className="hover:bg-gray-50 transition-colors duration-200">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          #{order.orderId}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {formatDate(order.orderDate)}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {order.recipientName}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {order.deliveryAddress}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
                           {order.totalPrice?.toLocaleString('vi-VN')} VND
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">

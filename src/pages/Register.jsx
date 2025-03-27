@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { FaUser, FaEnvelope, FaLock, FaUserCircle, FaVenusMars, FaCalendar, FaMapMarkerAlt, FaPhone } from 'react-icons/fa';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -53,88 +54,165 @@ const Register = () => {
   };
 
   return (
-    <div className="p-8 max-w-md mx-auto">
-      <h2 className="text-3xl font-bold mb-6">Đăng ký</h2>
-      <form onSubmit={handleRegister} className="space-y-4">
-        <input 
-          type="text" 
-          name="username" 
-          placeholder="Tên đăng nhập" 
-          value={formData.username} 
-          onChange={handleChange} 
-          className="w-full p-2 border rounded" 
-          required 
-        />
-        <input 
-          type="email" 
-          name="email" 
-          placeholder="Email" 
-          value={formData.email} 
-          onChange={handleChange} 
-          className="w-full p-2 border rounded" 
-          required 
-        />
-        <input 
-          type="password" 
-          name="password" 
-          placeholder="Mật khẩu" 
-          value={formData.password} 
-          onChange={handleChange} 
-          className="w-full p-2 border rounded" 
-          required 
-        />
-        <input 
-          type="text" 
-          name="fullName" 
-          placeholder="Họ và tên" 
-          value={formData.fullName} 
-          onChange={handleChange} 
-          className="w-full p-2 border rounded" 
-          required 
-        />
-        <select 
-          name="gender" 
-          value={formData.gender} 
-          onChange={handleChange} 
-          className="w-full p-2 border rounded"
-        >
-          <option value="true">Nam</option>
-          <option value="false">Nữ</option>
-        </select>
-        <input 
-          type="date" 
-          name="dateOfBirth" 
-          value={formData.dateOfBirth} 
-          onChange={handleChange} 
-          className="w-full p-2 border rounded" 
-          required 
-        />
-        <input 
-          type="text" 
-          name="address" 
-          placeholder="Địa chỉ" 
-          value={formData.address} 
-          onChange={handleChange} 
-          className="w-full p-2 border rounded" 
-          required 
-        />
-        <input 
-          type="text" 
-          name="phone" 
-          placeholder="Số điện thoại" 
-          value={formData.phone} 
-          onChange={handleChange} 
-          className="w-full p-2 border rounded" 
-          required 
-        />
-        {error && <p className="text-red-500">{error}</p>}
-        <button 
-          type="submit" 
-          className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
-        >
-          Đăng ký
-        </button>
-      </form>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow-lg">
+        <div>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            👋 Đăng ký tài khoản
+          </h2>
+        </div>
+
+        <form onSubmit={handleRegister} className="mt-8 space-y-6">
+          <div className="rounded-md shadow-sm space-y-4">
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FaUser className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                type="text"
+                name="username"
+                placeholder="Tên đăng nhập"
+                value={formData.username}
+                onChange={handleChange}
+                className="appearance-none relative block w-full pl-10 pr-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                required
+              />
+            </div>
+
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FaEnvelope className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                type="email"
+                name="email"
+                placeholder="Email"
+                value={formData.email}
+                onChange={handleChange}
+                className="appearance-none relative block w-full pl-10 pr-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                required
+              />
+            </div>
+
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FaLock className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                type="password"
+                name="password"
+                placeholder="Mật khẩu"
+                value={formData.password}
+                onChange={handleChange}
+                className="appearance-none relative block w-full pl-10 pr-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                required
+              />
+            </div>
+
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FaUserCircle className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                type="text"
+                name="fullName"
+                placeholder="Họ và tên"
+                value={formData.fullName}
+                onChange={handleChange}
+                className="appearance-none relative block w-full pl-10 pr-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                required
+              />
+            </div>
+
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FaVenusMars className="h-5 w-5 text-gray-400" />
+              </div>
+              <select
+                name="gender"
+                value={formData.gender}
+                onChange={handleChange}
+                className="appearance-none relative block w-full pl-10 pr-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm bg-white"
+              >
+                <option value="true">Nam</option>
+                <option value="false">Nữ</option>
+              </select>
+            </div>
+
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FaCalendar className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                type="date"
+                name="dateOfBirth"
+                value={formData.dateOfBirth}
+                onChange={handleChange}
+                className="appearance-none relative block w-full pl-10 pr-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                required
+              />
+            </div>
+
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FaMapMarkerAlt className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                type="text"
+                name="address"
+                placeholder="Địa chỉ"
+                value={formData.address}
+                onChange={handleChange}
+                className="appearance-none relative block w-full pl-10 pr-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                required
+              />
+            </div>
+
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FaPhone className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                type="text"
+                name="phone"
+                placeholder="Số điện thoại"
+                value={formData.phone}
+                onChange={handleChange}
+                className="appearance-none relative block w-full pl-10 pr-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                required
+              />
+            </div>
+          </div>
+
+          {error && (
+            <div className="rounded-md bg-red-50 p-4">
+              <div className="flex">
+                <div className="ml-3">
+                  <h3 className="text-sm font-medium text-red-800">{error}</h3>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div>
+            <button
+              type="submit"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            >
+              Đăng ký
+            </button>
+          </div>
+        </form>
+
+        <div className="text-center mt-4">
+          <p className="text-sm text-gray-600">
+            Đã có tài khoản?{' '}
+            <a href="/login" className="font-medium text-indigo-600 hover:text-indigo-500">
+              Đăng nhập
+            </a>
+          </p>
+        </div>
+      </div>
     </div>
   );
 };

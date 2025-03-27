@@ -3,11 +3,14 @@ import { useSelector, useDispatch } from "react-redux";
 import { removeFromCart, clearCart, updateQuantity } from "../redux/slices/cartSlice";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../utils/axiosInstance";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Cart = () => {
   const cartItems = useSelector((state) => state.cart?.items ?? []);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
   // State lưu số lượng cho từng sản phẩm
   const [quantities, setQuantities] = useState(
@@ -70,12 +73,30 @@ const Cart = () => {
   // Xử lý đặt hàng
   const handleCheckout = async () => {
     if (!recipientName || !deliveryAddress || !shippingMethod) {
-      alert("Vui lòng nhập đầy đủ thông tin giao hàng!");
+      toast.error("Vui lòng nhập đầy đủ thông tin giao hàng!", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
       return;
     }
 
     if (cartItems.length === 0) {
-      alert("Giỏ hàng trống!");
+      toast.error("Giỏ hàng trống!", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
       return;
     }
 
@@ -128,9 +149,22 @@ const Cart = () => {
         await axiosInstance.post("/order-stages", paymentStageData);
         
         dispatch(clearCart());
-        setShowStatus(true);
+        setShowStatus(false);
+        setShowSuccessMessage(true);
+        
+        toast.success('Đặt hàng thành công!', {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+
         setTimeout(() => {
-          setShowStatus(false);
+          setShowSuccessMessage(false);
           navigate("/member", { 
             state: { 
               orderId: orderId,
@@ -146,12 +180,21 @@ const Cart = () => {
               }
             }
           });
-        }, 2000);
+        }, 3000);
       }
     } catch (error) {
       console.error("Error details:", error);
       setOrderStatus("error");
-      alert("Có lỗi xảy ra. Vui lòng thử lại!");
+      toast.error("Có lỗi xảy ra. Vui lòng thử lại!", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
     } finally {
       setIsLoading(false);
     }
@@ -251,26 +294,83 @@ const Cart = () => {
 
           {orderStatus === "success" && (
             <div className="text-center">
-              <div className="text-green-500 text-6xl mb-4">✓</div>
-              <p className="text-lg font-semibold text-gray-700">Đặt hàng thành công!</p>
-              <p className="text-gray-600 mt-2">Cảm ơn bạn đã đặt hàng</p>
-              <div className="mt-4">
-                <p className="text-sm text-gray-600">Mã đơn hàng: {orderStage}</p>
-                <p className="text-sm text-gray-600">Trạng thái: Chờ xử lý</p>
+              <div className="relative">
+                <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                  </svg>
+                </div>
+                <div className="absolute -top-2 -right-2 bg-green-500 text-white rounded-full w-8 h-8 flex items-center justify-center">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                  </svg>
+                </div>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-800 mb-2">Đặt hàng thành công!</h3>
+              <p className="text-gray-600 mb-6">Cảm ơn bạn đã tin tưởng và ủng hộ chúng tôi</p>
+              
+              <div className="bg-gray-50 rounded-lg p-4 mb-6">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-gray-600">Mã đơn hàng:</span>
+                  <span className="font-semibold text-gray-800">{orderStage}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-600">Trạng thái:</span>
+                  <span className="font-semibold text-green-600">Chờ xử lý</span>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <button
+                  onClick={() => {
+                    setShowStatus(false);
+                    navigate("/member", { 
+                      state: { 
+                        orderId: orderStage,
+                        orderDetails: {
+                          recipientName,
+                          deliveryAddress,
+                          shippingMethod,
+                          totalPrice,
+                          orderDate: new Date().toLocaleString(),
+                          status: "Chờ xử lý",
+                          paymentMethod: paymentMethod,
+                          paymentStatus: "Chưa thanh toán"
+                        }
+                      }
+                    });
+                  }}
+                  className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+                >
+                  Xem chi tiết đơn hàng
+                </button>
+                <button
+                  onClick={() => {
+                    setShowStatus(false);
+                    navigate("/");
+                  }}
+                  className="w-full bg-gray-200 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
+                >
+                  Tiếp tục mua sắm
+                </button>
               </div>
             </div>
           )}
 
           {orderStatus === "error" && (
             <div className="text-center">
-              <div className="text-red-500 text-6xl mb-4">✕</div>
-              <p className="text-lg font-semibold text-gray-700">Đặt hàng thất bại</p>
-              <p className="text-gray-600 mt-2">Vui lòng thử lại sau</p>
+              <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-800 mb-2">Đặt hàng thất bại</h3>
+              <p className="text-gray-600 mb-6">Vui lòng thử lại sau</p>
               <button
                 onClick={() => setShowStatus(false)}
-                className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
+                className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
               >
-                Đóng
+                Thử lại
               </button>
             </div>
           )}
@@ -279,8 +379,53 @@ const Cart = () => {
     );
   };
 
+  // Component hiển thị thông báo thành công
+  const SuccessMessage = () => {
+    if (!showSuccessMessage) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white p-8 rounded-lg shadow-xl max-w-md w-full mx-4 transform transition-all duration-500 ease-in-out">
+          <div className="text-center">
+            <div className="relative">
+              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+              </div>
+              <div className="absolute -top-2 -right-2 bg-green-500 text-white rounded-full w-8 h-8 flex items-center justify-center">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+              </div>
+            </div>
+            <h3 className="text-2xl font-bold text-gray-800 mb-2">Đặt hàng thành công!</h3>
+            <p className="text-gray-600 mb-6">Cảm ơn bạn đã tin tưởng và ủng hộ chúng tôi</p>
+            
+            <div className="bg-gray-50 rounded-lg p-4 mb-6">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-gray-600">Mã đơn hàng:</span>
+                <span className="font-semibold text-gray-800">{orderStage}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-gray-600">Trạng thái:</span>
+                <span className="font-semibold text-green-600">Chờ xử lý</span>
+              </div>
+            </div>
+
+            <div className="animate-pulse text-blue-600 mb-6">
+              Đang chuyển hướng đến trang chi tiết đơn hàng...
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="max-w-5xl mx-auto py-10 px-6">
+      <ToastContainer />
+      <SuccessMessage />
       <OrderStatusDisplay />
       <ConfirmOrderModal />
       <h2 className="text-3xl font-bold mb-6 text-center">🛒 Giỏ hàng của bạn</h2>
