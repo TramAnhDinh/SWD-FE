@@ -1,53 +1,87 @@
-/* .staff-container {
-    text-align: center;
+/* Container tổng thể */
+.staff-container {
+    max-width: 1200px;
+    margin: auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+/* Ô tìm kiếm */
+.search-input {
+    width: 100%;
+    max-width: 400px;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #bbb;
+    border-radius: 8px;
+    font-size: 16px;
+    box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Bảng sản phẩm */
+.product-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.product-table th {
+    background-color: #007bff;
+    color: white;
+    padding: 14px;
+    text-align: left;
+    font-weight: bold;
+}
+
+.product-table td {
+    border-bottom: 1px solid #ddd;
+    padding: 14px;
+    text-align: left;
+}
+
+/* Hover cho hàng trong bảng */
+.product-table tbody tr:hover {
+    background-color: #f9f9f9;
+    transition: background-color 0.3s ease;
+}
+
+/* Hình ảnh sản phẩm */
+.product-table img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+/* Nút hành động */
+.action-buttons {
+    display: flex;
+    gap: 20px;
+}
+
+.add-btn, .edit-btn, .delete-btn {
+    border: none;
+    padding: 10px 14px;
+    cursor: pointer;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    font-weight: bold;
 }
 
 .add-btn {
     background-color: #28a745;
     color: white;
-    padding: 10px 15px;
-    margin-bottom: 10px;
-    border: none;
-    cursor: pointer;
-    border-radius: 5px;
-}
-
-.add-btn:hover {
-    background-color: #218838;
-}
-
-.product-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.product-table th, .product-table td {
-    border: 1px solid #ddd;
-    padding: 10px;
-    text-align: center;
-}
-
-.product-image {
-    width: 50px;
-    height: 50px;
-    object-fit: cover;
-}
-
-.edit-btn, .delete-btn, .view-btn {
-    margin: 3px;
-    padding: 5px 10px;
-    border: none;
-    cursor: pointer;
-    border-radius: 3px;
 }
 
 .edit-btn {
-    background-color: #ffc107;
-    color: black;
-}
-
-.edit-btn:hover {
-    background-color: #e0a800;
+    background-color: #007bff;
+    color: rgb(247, 242, 242);
+    margin-right: 10px;
 }
 
 .delete-btn {
@@ -55,248 +89,107 @@
     color: white;
 }
 
+.add-btn:hover {
+    background-color: #218838;
+}
+
+.edit-btn:hover {
+    background-color: #e0a800;
+}
+
 .delete-btn:hover {
     background-color: #c82333;
 }
 
-.view-btn {
-    background-color: #007bff;
-    color: white;
-}
-
-.view-btn:hover {
-    background-color: #0056b3;
-}
-
+/* Modal */
 .modal {
+    display: flex !important;
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     background: white;
     padding: 20px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.3);
     z-index: 1000;
+    max-width: 500px;
+    width: 90%;
+    flex-direction: column;
+    align-items: center;
+    overflow-y: auto;
+    max-height: 90vh;
 }
-.modal-content {
+
+.modal-header {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.modal-body {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-} */
-.staff-container {
-    padding: 20px;
-    max-width: 1200px;
-    margin: 0 auto;
+    gap: 15px;
+}
+.modal-body label {
+    font-weight: bold;
 }
 
-.staff-container h2 {
-    color: #333;
-    margin-bottom: 20px;
-    font-size: 24px;
+.modal-body .form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 12px;
+}
+.modal-body .form-group label {
+    font-weight: bold;
+    margin-bottom: 6px; /* Đẩy label xa input hơn */
 }
 
-.add-btn {
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+.modal-body input,
+.modal-body textarea,
+.modal-body select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
     font-size: 16px;
-    margin-bottom: 20px;
-    transition: background-color 0.3s;
 }
 
-.add-btn:hover {
-    background-color: #45a049;
-}
-
-.product-table {
-    width: 100%;
-    border-collapse: collapse;
-    background-color: white;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.product-table th,
-.product-table td {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-}
-
-.product-table th {
-    background-color: #f5f5f5;
-    font-weight: 600;
-    color: #333;
-}
-
-.product-table tr:hover {
-    background-color: #f9f9f9;
-}
-
-.product-image {
-    width: 100px;
-    height: 100px;
-    object-fit: cover;
-    border-radius: 4px;
-}
-
-.edit-btn,
-.delete-btn {
-    padding: 6px 12px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-right: 8px;
-    transition: background-color 0.3s;
-}
-
-.edit-btn {
-    background-color: #2196F3;
-    color: white;
-}
-
-.edit-btn:hover {
-    background-color: #1976D2;
-}
-
-.delete-btn {
-    background-color: #f44336;
-    color: white;
-}
-
-.delete-btn:hover {
-    background-color: #d32f2f;
-}
-
-/* Modal Styles */
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+.modal-footer {
     display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-.modal-content {
-    background-color: white;
-    padding: 30px;
-    border-radius: 8px;
-    width: 90%;
-    max-width: 600px;
-    max-height: 90vh;
-    overflow-y: auto;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.modal-content h3 {
-    color: #333;
-    margin-bottom: 20px;
-    font-size: 20px;
-    border-bottom: 2px solid #eee;
-    padding-bottom: 10px;
-}
-
-.modal-content label {
-    display: block;
-    margin-bottom: 15px;
-    color: #555;
-    font-weight: 500;
-}
-
-.modal-content input[type="text"],
-.modal-content input[type="number"],
-.modal-content textarea,
-.modal-content select {
-    width: 100%;
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
-    transition: border-color 0.3s;
-}
-
-.modal-content input[type="text"]:focus,
-.modal-content input[type="number"]:focus,
-.modal-content textarea:focus,
-.modal-content select:focus {
-    border-color: #2196F3;
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.1);
-}
-
-.modal-content textarea {
-    min-height: 100px;
-    resize: vertical;
-}
-
-.modal-content select {
-    background-color: white;
-    cursor: pointer;
-}
-
-.modal-content .button-group {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 20px;
-}
-
-.save-btn,
-.close-btn {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.3s;
-    
+    justify-content: space-between;
+    padding-top: 10px;
 }
 
 .save-btn {
-    background-color: #4CAF50 !important;
+    background: #28a745;
     color: white;
-
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    flex-grow: 1;
+    margin-right: 5px;
 }
 
-.save-btn:hover {
-    background-color: #45a049;
-}
 
 .close-btn {
-    background-color: #f44336;
+    background: #dc3545;
     color: white;
-    margin-top: 20px;
- 
-}
-.close-btn-container {
-    display: flex;
-    justify-content: flex-end; /* Đẩy nút close sang phải */
-}
-.close-btn:hover {
-    background-color: #d32f2f;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    flex-grow: 1;
+    margin-left: 5px;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .product-table {
-        display: block;
-        overflow-x: auto;
-    }
-
-    .modal-content {
+@media (max-width: 600px) {
+    .modal {
         width: 95%;
-        padding: 20px;
-    }
-
-    .product-image {
-        width: 80px;
-        height: 80px;
     }
 }

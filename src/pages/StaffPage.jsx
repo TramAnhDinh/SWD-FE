@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProducts, deleteProduct, updateProduct, addProduct } from "../redux/slices/productsSlice";
 import "./staffPage.css";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 const StaffPage = () => {
     const dispatch = useDispatch();
@@ -10,8 +13,12 @@ const StaffPage = () => {
     const [categories, setCategories] = useState([]);
     const [showConfirmDialog, setShowConfirmDialog] = useState(false);
     const [selectedProductId, setSelectedProductId] = useState(null);
+    const [searchTerm, setSearchTerm] = useState("");
 
     const products = Array.isArray(items) ? items : [];
+    const filteredProducts = products.filter(product =>
+        product.productName?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     const [isModalOpen, setModalOpen] = useState(false);
     const [editingProduct, setEditingProduct] = useState(null);
@@ -54,17 +61,23 @@ const StaffPage = () => {
         if (selectedProductId) {
             await dispatch(deleteProduct(selectedProductId));
             dispatch(fetchProducts());
+            toast.success("Xóa sản phẩm thành công!", { autoClose: 3000 });
             setShowConfirmDialog(false);
             setSelectedProductId(null);
+            console.log("isModalOpen sau khi mở Edit Modal:", isModalOpen);
         }
     };
 
     const openEditModal = (product) => {
+        console.log("Mở modal chỉnh sửa", product);
+        toast.info(`Chỉnh sửa sản phẩm: ${product.productName}`, { autoClose: 2000 });
         setEditingProduct({ ...product });
         setModalOpen(true);
     };
 
     const openAddModal = () => {
+        console.log("Mở modal thêm sản phẩm");
+        toast.success("Mở modal thêm sản phẩm!", { autoClose: 2000 });
         setEditingProduct(null);
         setNewProduct({
             productName: "",
@@ -75,19 +88,25 @@ const StaffPage = () => {
             categoryId: categories[0]?.categoryId || 1
         });
         setModalOpen(true);
+        console.log("isModalOpen sau khi mở Add Modal:", isModalOpen);
     };
 
     const handleSave = async () => {
+        console.log("Lưu sản phẩm:", editingProduct || newProduct);
         if (editingProduct) {
             await dispatch(updateProduct(editingProduct));
+            toast.success("Cập nhật sản phẩm thành công!", { autoClose: 2000 });
         } else {
             await dispatch(addProduct(newProduct));
+            toast.success("Thêm sản phẩm mới thành công!", { autoClose: 2000 });
         }
+        // toast.error("Có lỗi xảy ra khi lưu sản phẩm!", { autoClose: 3000 });
         setModalOpen(false);
         dispatch(fetchProducts());
     };
 
     const handleInputChange = (value, field) => {
+        console.log(`Thay đổi: ${field} =`, value, "Trạng thái hiện tại:", editingProduct || newProduct);
         if (editingProduct) {
             setEditingProduct({ ...editingProduct, [field]: value });
         } else {
@@ -125,42 +144,53 @@ const StaffPage = () => {
 
     return (
         <div className="staff-container">
+             <ToastContainer position="top-right" autoClose={3000}/> {/* Thêm dòng này để hiển thị thông báo */}
             <DeleteConfirmDialog />
             <h2>Quản lý sản phẩm</h2>
+            {/* Ô tìm kiếm */}
+            <input
+                type="text"
+                placeholder="Tìm kiếm sản phẩm..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="search-input"
+            />
+
             {userRole !== "staff" && (
                 <button className="add-btn" onClick={openAddModal}>Thêm sản phẩm</button>
+                
             )}
             <table className="product-table">
                 <thead>
                     <tr>
                         <th>ID</th>
+                        <th>Hình ảnh</th>
                         <th>Tên sản phẩm</th>
                         <th>Giá</th>
-                        <th>Tồn kho</th>
-                        <th>Hình ảnh</th>
+                        <th>Tồn kho</th>                       
                         <th>Mô tả</th>
                         <th>Danh mục</th>
                         {userRole !== "staff" && <th>Hành động</th>}
                     </tr>
                 </thead>
                 <tbody>
-                    {products.length > 0 ? (
-                        products.map((product) => (
+                    {filteredProducts.length > 0 ? (
+                        filteredProducts.map((product) => (
                             <tr key={product.productId}>
                                 <td>{product.productId}</td>
-                                <td>{product.productName}</td>
-                                <td>{product.price} VND</td>
-                                <td>{product.stockInStorage}</td>
                                 <td>
                                     <img
                                         src={product.image && product.image.startsWith("http") 
                                         ? product.image 
                                          : `https://phamdangtuc-001-site1.ntempurl.com/uploads/${product.image ? product.image.split("\\").pop() : "fallback-image.jpg"}`}
                                         alt={product.productName}
-                                        className="w-full h-60 object-cover rounded-md mb-2 hover:opacity-80 transition-opacity"
+                                        className="w-32 h-32 object-cover rounded-md mb-2 hover:opacity-80 transition-opacity"
                                          onError={(e) => e.target.src = "/fallback-image.jpg"} 
                                     />
                                 </td>
+                                <td>{product.productName}</td>
+                                <td>{product.price.toLocaleString('vi-vn')} VND</td>
+                                <td>{product.stockInStorage}</td>                        
                                 <td>{product.description}</td>
                                 <td>
                                     {categories.find(cat => cat.categoryId === product.categoryId)?.categoryName || 'Chưa phân loại'}
@@ -185,7 +215,8 @@ const StaffPage = () => {
                 <div className="modal">
                     <div className="modal-content">
                         <h3>{editingProduct ? "Sửa sản phẩm" : "Thêm sản phẩm"}</h3>
-                        <label>
+                        <div class="modal-body">
+                        <label >
                             Tên sản phẩm:
                             <input
                                 type="text"
@@ -193,6 +224,9 @@ const StaffPage = () => {
                                 onChange={(e) => handleInputChange(e.target.value, 'productName')}
                             />
                         </label>
+                        </div>
+                        <div class="row">
+                        <div class="form-group half">
                         <label>
                             Giá:
                             <input
@@ -201,6 +235,8 @@ const StaffPage = () => {
                                 onChange={(e) => handleInputChange(e.target.value, 'price')}
                             />
                         </label>
+                        </div>
+                        <div class="form-group half">
                         <label>
                             Tồn kho:
                             <input
@@ -209,6 +245,10 @@ const StaffPage = () => {
                                 onChange={(e) => handleInputChange(e.target.value, 'stockInStorage')}
                             />
                         </label>
+                        </div>
+                        </div>
+
+                        <div class="form-group">
                         <label>
                             Ảnh:
                             <input
@@ -217,6 +257,9 @@ const StaffPage = () => {
                                 onChange={(e) => handleInputChange(e.target.value, 'image')}
                             />
                         </label>
+                        </div>
+
+                        <div class="form-group">
                         <label>
                             Mô tả:
                             <textarea
@@ -224,6 +267,9 @@ const StaffPage = () => {
                                 onChange={(e) => handleInputChange(e.target.value, 'description')}
                             />
                         </label>
+                        </div>
+
+                        <div class="form-group">
                         <label>
                             Danh mục:
                             <select
@@ -237,6 +283,8 @@ const StaffPage = () => {
                                 ))}
                             </select>
                         </label>
+                        </div>
+
                         <div className="button-container">
                             <button className="save-btn" onClick={handleSave}>Lưu</button>
                             <div className="close-btn-container">
