@@ -474,14 +474,14 @@ const Cart = () => {
                 onChange={(e) => setDeliveryAddress(e.target.value)}
                 className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
-            <select
+            {/* <select
               value={shippingMethod}
               onChange={(e) => setShippingMethod(e.target.value)}
                 className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="Giao thường">Giao thường</option>
               <option value="Giao nhanh">Giao nhanh (+10,000 VND)</option>
-            </select>
+            </select> */}
             <input
               placeholder="Số điện thoại"
               value={notes}

@@ -73,8 +73,8 @@ const Header = () => {
                   </button>
                   {designDropdownOpen && (
                     <div className="bg-gray-900">
-                      <Link to="/design" className="block px-6 py-2 hover:bg-gray-800">TUỲ CHỈNH</Link>
-                      <Link to="/design/templates" className="block px-6 py-2 hover:bg-gray-800">MẪU CÓ SẴN</Link>
+                      {/* <Link to="/design" className="block px-6 py-2 hover:bg-gray-800">TUỲ CHỈNH</Link> */}
+                      <Link to="/design/templates" className="block px-6 py-2 hover:bg-gray-800">SẢN PHẨM</Link>
                     </div>
                   )}
                 </div>
@@ -122,8 +122,8 @@ const Header = () => {
                 THIẾT KẾ ÁO <ChevronDown className="ml-2" />
               </button>
               <div className="absolute left-0 top-full w-48 bg-black border border-gray-700 rounded-lg hidden group-hover:block z-50">
-                <Link to="/design/custom" className="block px-4 py-2 hover:bg-gray-800">TUỲ CHỈNH</Link>
-                <Link to="/design/mau-co-san" className="block px-4 py-2 hover:bg-gray-800">MẪU CÓ SẴN</Link>
+                {/* <Link to="/design/custom" className="block px-4 py-2 hover:bg-gray-800">TUỲ CHỈNH</Link> */}
+                <Link to="/design/mau-co-san" className="block px-4 py-2 hover:bg-gray-800">SẢN PHẨM</Link>
               </div>
             </div>
 

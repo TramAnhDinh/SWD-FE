@@ -17,6 +17,7 @@ const ProductDetail = () => {
   const [category, setCategory] = useState(null);
   const [customDescription, setCustomDescription] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
+  const cartItems = useSelector(state => state.cart.items);
 
   const shirtColors = [
     "Trắng",
@@ -78,11 +79,19 @@ const ProductDetail = () => {
     }
   }, [id]);
 
+  
+
   const handleAddToCart = () => {
     if (!selectedColor) {
       toast.error("Vui lòng chọn màu áo!");
       return;
     }
+    if (cartItems.length > 0) {
+      toast.error("⚠️ Bạn chỉ có thể thêm 1 sản phẩm vào giỏ hàng!", { autoClose: 2000 });
+      return;
+    }
+    // dispatch(addToCartAction(product));
+    // toast.success("✅ Đã thêm sản phẩm vào giỏ hàng!", { autoClose: 1000 });
 
     if (product) {
       try {
@@ -101,11 +110,18 @@ const ProductDetail = () => {
         console.log("Adding to cart:", productWithDetails);
         dispatch(addToCartAction(productWithDetails));
         toast.success('Đã thêm sản phẩm vào giỏ hàng!');
+
+        // Chuyển hướng sang trang giỏ hàng sau khi thêm thành công
+        setTimeout(() => {
+        navigate("/cart");
+        }, 1200);
+
       } catch (err) {
         toast.error('Có lỗi xảy ra khi thêm vào giỏ hàng. Vui lòng thử lại.');
       }
     }
   };
+  
 
   if (loading) {
     return (

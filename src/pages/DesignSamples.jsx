@@ -152,12 +152,12 @@ const DesignSamples = () => {
                   {product.productName}
                 </h3>
                 <p className="text-center text-lg font-semibold mb-2">{product.price.toLocaleString()} VND</p>
-                <button 
+                {/* <button 
                   className="w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-700 transition-colors" 
                   onClick={() => handleAddToCart(product)}
                 >
                   🛒 Thêm vào giỏ hàng
-                </button>
+                </button> */}
               </div>
             ))
           ) : (

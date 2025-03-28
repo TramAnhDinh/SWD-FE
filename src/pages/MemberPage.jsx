@@ -189,7 +189,7 @@ const MemberPage = () => {
             >
               Thông tin cá nhân
             </button>
-            <button
+            {/* <button
               className={`flex-1 py-4 px-6 text-center font-medium transition-colors duration-200 ${
                 activeTab === "orders-stage"
                   ? "text-indigo-600 border-b-2 border-indigo-600"
@@ -198,7 +198,7 @@ const MemberPage = () => {
               onClick={() => setActiveTab("orders-stage")}
             >
               Lịch sử đơn hàng
-            </button>
+            </button> */}
           </div>
         </div>
 
