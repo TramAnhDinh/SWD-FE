@@ -75,6 +75,7 @@ const MemberPage = () => {
       setOrdersLoading(false);
     }
   };
+  
 
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {
@@ -190,11 +191,11 @@ const MemberPage = () => {
             </button>
             <button
               className={`flex-1 py-4 px-6 text-center font-medium transition-colors duration-200 ${
-                activeTab === "orders"
+                activeTab === "orders-stage"
                   ? "text-indigo-600 border-b-2 border-indigo-600"
                   : "text-gray-500 hover:text-gray-700"
               }`}
-              onClick={() => setActiveTab("orders")}
+              onClick={() => setActiveTab("orders-stage")}
             >
               Lịch sử đơn hàng
             </button>
