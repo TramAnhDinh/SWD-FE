@@ -279,7 +279,7 @@ const OrderTracking = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{new Intl.NumberFormat('vi-VN').format(order.totalPrice)} VND</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.notes || "N/A"}</td>
                         
-                        {/* <td className="px-6 py-4 whitespace-nowrap">
+                        <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getStageStyle(getOrderStage(order.orderId))}`}>
                             {getOrderStage(order.orderId)}
                           </span>
@@ -316,8 +316,9 @@ const OrderTracking = () => {
                               <span className="text-gray-500 text-sm italic">Đã thanh toán</span>
                             )}
                           </div>
-                        </td> */}
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        </td>
+
+                        {/* <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center gap-2">
                             {getOrderStage(order.orderId) !== "Hoàn thành" && !isPurchased(order.orderId) ? (
                               <>
@@ -348,7 +349,7 @@ const OrderTracking = () => {
                     <span className="text-gray-500 text-sm italic">Đã hoàn thành</span>
                    )}
                     </div>
-                      </td>
+                      </td> */}
                         <td className="px-6 py-4 whitespace-nowrap">
                           <button
                             className="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2"
