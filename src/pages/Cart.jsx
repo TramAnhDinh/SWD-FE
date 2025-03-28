@@ -10,6 +10,7 @@ import { Trash } from "lucide-react";
 
 const Cart = () => {
   const cartItems = useSelector((state) => state.cart?.items ?? []);
+  const user = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
@@ -94,30 +95,12 @@ const Cart = () => {
   // Xử lý đặt hàng
   const handleCheckout = async () => {
     if (!recipientName || !deliveryAddress || !shippingMethod) {
-      toast.error("Vui lòng nhập đầy đủ thông tin giao hàng!", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
+      toast.error("Vui lòng nhập đầy đủ thông tin giao hàng!");
       return;
     }
 
     if (cartItems.length === 0) {
-      toast.error("Giỏ hàng trống!", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
+      toast.error("Giỏ hàng trống!");
       return;
     }
 
@@ -125,97 +108,56 @@ const Cart = () => {
     setOrderStatus("processing");
     setShowStatus(true);
 
-    const orderData = {
-      customizeProductId: cartItems[0]?.customizeProductId || 1,
-      orderDate: new Date().toISOString(),
-      deliveryDate: new Date().toISOString(),
-      recipientName,
-      deliveryAddress,
-      shippingMethod,
-      shippingFee: shippingMethod === "Giao nhanh" ? 10000 : 0,
-      notes: notes || "",
-      price: cartItems.reduce((sum, item) => sum + item.price, 0),
-      quantity: cartItems.reduce((sum, item) => sum + item.quantity, 0),
-      totalPrice,
-      status: "Chờ xử lý",
-      paymentMethod: paymentMethod
-    };
-
     try {
-      // 1. Tạo đơn hàng
-      const orderResponse = await axiosInstance.post("/Orders", orderData);
-      const orderId = orderResponse.data.id || orderResponse.data.orderId;
+      const tokenPayload = JSON.parse(atob(user.token.split('.')[1]));
+      const userId = tokenPayload.User_Id;
 
-      // 2. Tạo order stage cho trạng thái đơn hàng
-      const stageData = {
-        orderId: orderId,
-        orderStageName: "Chờ xử lý",
-        updatedDate: new Date().toISOString()
-      };
+      // Lấy sản phẩm từ giỏ hàng
+      const customProduct = cartItems[0];
       
-      await axiosInstance.post("/order-stages", stageData);
+      const orderData = {
+        productId: customProduct.productId,
+        userId: Number(userId),
+        shirtColor: customProduct.shirtColor || "N/A",
+        description: customProduct.customDescription || "",
+        customDescription: customProduct.customDescription || "",
+        recipientName: recipientName,
+        deliveryAddress: deliveryAddress,
+        shippingMethod: shippingMethod,
+        shippingFee: shippingMethod === "Giao nhanh" ? 10000 : 0,
+        notes: notes || "",
+        quantity: customProduct.quantity,
+        deliveryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+        fullImage: customProduct.image || "",
+        price: customProduct.price,
+        totalPrice: (customProduct.price * customProduct.quantity) + (shippingMethod === "Giao nhanh" ? 10000 : 0)
+      };
 
-      // 3. Xử lý theo phương thức thanh toán
-      if (paymentMethod === "online") {
-        // Thanh toán VNPAY
-        await handleVNPayPayment(orderId);
+      console.log("Sending order data:", orderData);
+      const response = await axiosInstance.post("/customizeproducts/create-with-order", orderData);
+      
+      if (response.data && response.data.orderId) {
+        const orderId = response.data.orderId;
+        setOrderStage(orderId);
+        
+        if (paymentMethod === "online") {
+          await handleVNPayPayment(orderId);
+        } else {
+          dispatch(clearCart());
+          setShowSuccessMessage(true);
+          setOrderStatus("success");
+          
+          setTimeout(() => {
+            navigate(`/order-detail/${orderId}`);
+          }, 3000);
+        }
       } else {
-        // Thanh toán COD
-        const paymentStageData = {
-          orderId: orderId,
-          orderStageName: "Chưa thanh toán",
-          updatedDate: new Date().toISOString()
-        };
-        
-        await axiosInstance.post("/order-stages", paymentStageData);
-        
-        dispatch(clearCart());
-        setShowStatus(false);
-        setShowSuccessMessage(true);
-        
-        toast.success('Đặt hàng thành công!', {
-          position: "top-right",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
-
-        setTimeout(() => {
-          setShowSuccessMessage(false);
-          navigate("/member", { 
-            state: { 
-              orderId: orderId,
-              orderDetails: {
-                recipientName,
-                deliveryAddress,
-                shippingMethod,
-                totalPrice,
-                orderDate: new Date().toLocaleString(),
-                status: "Chờ xử lý",
-                paymentMethod: "cod",
-                paymentStatus: "Chưa thanh toán"
-              }
-            }
-          });
-        }, 3000);
+        throw new Error("Không nhận được mã đơn hàng");
       }
     } catch (error) {
-      console.error("Error details:", error);
+      console.error("Error:", error);
       setOrderStatus("error");
-      toast.error("Có lỗi xảy ra. Vui lòng thử lại!", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-      });
+      toast.error("Có lỗi xảy ra khi đặt hàng. Vui lòng thử lại!");
     } finally {
       setIsLoading(false);
     }
@@ -257,9 +199,17 @@ const Cart = () => {
             <div>
               <h4 className="font-semibold">Chi tiết đơn hàng:</h4>
               {cartItems.map((item) => (
-                <div key={item.productId} className="flex justify-between py-2">
-                  <span>{item.name} x {item.quantity}</span>
-                  <span>{(item.price * item.quantity).toLocaleString()} VND</span>
+                <div key={item.productId} className="space-y-2 py-2">
+                  <div className="flex justify-between">
+                    <span>{item.name} x {item.quantity}</span>
+                    <span>{(item.price * item.quantity).toLocaleString()} VND</span>
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    <p>Màu áo: {item.shirtColor || "Chưa chọn màu"}</p>
+                    {item.customDescription && (
+                      <p>Mô tả: {item.customDescription}</p>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
@@ -467,7 +417,13 @@ const Cart = () => {
                     {item.image && <img src={item.image} alt={item.name} className="w-16 h-16 object-cover" />}
                     <div>
                       <p className="text-lg font-semibold">{item.name}</p>
-                      <p className="text-gray-600">{(item.price * item.quantity).toLocaleString()} VND</p>
+                      <div className="text-sm text-gray-600 mt-1">
+                        <p><span className="font-medium">Màu áo:</span> {item.shirtColor || "Chưa chọn màu"}</p>
+                        {item.isCustomProduct && item.customDescription && (
+                          <p><span className="font-medium">Mô tả:</span> {item.customDescription}</p>
+                        )}
+                      </div>
+                      <p className="text-gray-600 mt-1">{(item.price * item.quantity).toLocaleString()} VND</p>
                       <div className="flex items-center mt-2">
                         <button
                           onClick={() => handleQuantityChange(item.productId, quantities[item.productId] - 1)}
@@ -490,11 +446,8 @@ const Cart = () => {
                       </div>
                     </div>
                   </div>
-                  {/* <button className="text-red-500" onClick={() => dispatch(removeFromCart(item.productId))}>
-                    ❌ Xóa
-                  </button> */}
                   <button onClick={() => handleRemoveItem(item.productId)}>
-                      <Trash size={20} className="text-red-500 cursor-pointer" />
+                    <Trash size={20} className="text-red-500 cursor-pointer" />
                   </button>
                 </li>
               ))}

@@ -17,6 +17,7 @@ import Register from './pages/Register';
 import Login from './pages/Login';
 import StaffPage from "./pages/StaffPage";
 import MemberPage from './pages/MemberPage';
+import OrderDetail from './pages/OrderDetail';
 
 import NewProductCarousel from './components/NewProductCarousel';
 import ContactPage from './pages/ContactPage';  // Đã có rồi, không cần thêm nữa
@@ -106,6 +107,7 @@ const AppContent = () => {
           {/* Protected routes for Staff (roleId = 2) */}
           <Route path="/staff" element={<ProtectedRoute allowedRoles={[2]}><StaffPage /></ProtectedRoute>} />
           <Route path="/order-tracking/" element={<ProtectedRoute allowedRoles={[2]}><OrderTracking /></ProtectedRoute>} />
+          <Route path="/order-detail/:orderId" element={<ProtectedRoute allowedRoles={[2]}><OrderDetail /></ProtectedRoute>} />
            {/* <Route path="/order-tracking/:orderId" element={<ProtectedRoute allowedRoles={[2]}><OrderTracking /></ProtectedRoute>} /> */}
 
 

@@ -5,6 +5,7 @@ import { addToCart as addToCartAction } from "../redux/slices/cartSlice";
 import { FaShoppingCart, FaArrowLeft, FaBox, FaTag, FaInfoCircle } from 'react-icons/fa';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import axiosInstance from "../utils/axiosInstance";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -14,6 +15,17 @@ const ProductDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [category, setCategory] = useState(null);
+  const [customDescription, setCustomDescription] = useState("");
+  const [selectedColor, setSelectedColor] = useState("");
+
+  const shirtColors = [
+    "Trắng",
+    "Đen",
+    "Xám",
+    "Đỏ",
+    "Xanh dương",
+    "Xanh lá",
+  ];
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -67,30 +79,30 @@ const ProductDetail = () => {
   }, [id]);
 
   const handleAddToCart = () => {
+    if (!selectedColor) {
+      toast.error("Vui lòng chọn màu áo!");
+      return;
+    }
+
     if (product) {
       try {
-        dispatch(addToCartAction(product));
-        toast.success('Đã thêm sản phẩm vào giỏ hàng!', {
-          position: "top-right",
-          autoClose: 1000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
+        const productWithDetails = {
+          ...product,
+          productId: product.productId,
+          name: product.productName,
+          isCustomProduct: true,
+          customDescription: customDescription,
+          shirtColor: selectedColor,
+          description: product.productName,
+          image: product.image,
+          price: product.price,
+          quantity: 1
+        };
+        console.log("Adding to cart:", productWithDetails);
+        dispatch(addToCartAction(productWithDetails));
+        toast.success('Đã thêm sản phẩm vào giỏ hàng!');
       } catch (err) {
-        toast.error('Có lỗi xảy ra khi thêm vào giỏ hàng. Vui lòng thử lại.', {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
+        toast.error('Có lỗi xảy ra khi thêm vào giỏ hàng. Vui lòng thử lại.');
       }
     }
   };
@@ -190,20 +202,46 @@ const ProductDetail = () => {
                 </div>
               )}
 
-              <div className="border-t border-gray-200 pt-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-3">Mô tả sản phẩm</h2>
-                <p className="text-gray-600 whitespace-pre-line">
-                  {product.description || "Chưa có mô tả chi tiết"}
-                </p>
-              </div>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Chọn màu áo
+                  </label>
+                  <select
+                    value={selectedColor}
+                    onChange={(e) => setSelectedColor(e.target.value)}
+                    className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    required
+                  >
+                    <option value="">-- Chọn màu --</option>
+                    {shirtColors.map((color) => (
+                      <option key={color} value={color}>
+                        {color}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-              <button
-                onClick={handleAddToCart}
-                className="w-full flex items-center justify-center space-x-2 bg-indigo-600 text-white py-3 px-6 rounded-lg hover:bg-indigo-700 transition-colors duration-200"
-              >
-                <FaShoppingCart className="text-xl" />
-                <span>Thêm vào giỏ hàng</span>
-              </button>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Mô tả tùy chỉnh (nếu cần)
+                  </label>
+                  <textarea
+                    value={customDescription}
+                    onChange={(e) => setCustomDescription(e.target.value)}
+                    className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    rows="4"
+                    placeholder="Nhập mô tả tùy chỉnh cho sản phẩm..."
+                  />
+                </div>
+
+                <button
+                  onClick={handleAddToCart}
+                  className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Thêm vào giỏ hàng
+                </button>
+              </div>
             </div>
           </div>
         </div>

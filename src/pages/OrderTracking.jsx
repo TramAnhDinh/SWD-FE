@@ -2,11 +2,12 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../utils/axiosInstance";
-import "./OrderTracking.css";
+// import "./OrderTracking.css";
 
 const OrderTracking = () => {
-  const { role } = useSelector((state) => state.user);
+  const { role, token } = useSelector((state) => state.user);
   const [orders, setOrders] = useState([]);
+  const [customizeProducts, setCustomizeProducts] = useState([]);
   const [orderStages, setOrderStages] = useState([]);
   const [selectedStatus, setSelectedStatus] = useState({});
   const [loading, setLoading] = useState(false);
@@ -27,24 +28,66 @@ const OrderTracking = () => {
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   useEffect(() => {
-    if (role === "staff") {
+    if (token) {
       fetchOrders();
       fetchOrderStages();
     }
-  }, [role]);
+  }, [token]);
 
   const fetchOrders = async () => {
     try {
-      const response = await axiosInstance.get("/Orders");
-      if (response.data?.$values) {
-        // Sắp xếp đơn hàng theo thời gian mới nhất
-        const sortedOrders = response.data.$values.sort((a, b) => {
-          return new Date(b.orderDate) - new Date(a.orderDate);
+      const tokenPayload = JSON.parse(atob(token.split('.')[1]));
+      const userId = tokenPayload.User_Id;
+
+      // Lấy thông tin customize products trước
+      const customizeResponse = await axiosInstance.get("/customizeproducts");
+      const customizeProducts = customizeResponse.data?.$values || [];
+      console.log("Customize Products:", customizeProducts);
+
+      // Lấy đơn hàng từ API orders
+      const ordersResponse = await axiosInstance.get("/orders");
+      console.log("Orders API Response:", ordersResponse.data);
+
+      if (ordersResponse.data?.$values) {
+        // Lọc đơn hàng theo userId nếu không phải staff
+        let orders = ordersResponse.data.$values;
+        if (role !== "staff") {
+          orders = orders.filter(order => {
+            const customizeProduct = customizeProducts.find(cp => cp.customizeProductId === order.customizeProductId);
+            return customizeProduct?.userId === Number(userId);
+          });
+        }
+
+        // Map customize products vào orders
+        const enrichedOrders = orders.map(order => {
+          const customizeProduct = customizeProducts.find(
+            cp => cp.customizeProductId === order.customizeProductId
+          );
+
+          return {
+            ...order,
+            customizeProduct: customizeProduct || {
+              customizeProductId: order.customizeProductId,
+              productId: order.productId,
+              shirtColor: order.shirtColor || "N/A",
+              description: order.description || "N/A",
+              price: order.price,
+              fullImage: order.fullImage
+            }
+          };
         });
-        console.log("Orders data:", sortedOrders);
+
+        // Sắp xếp theo thời gian mới nhất
+        const sortedOrders = enrichedOrders.sort((a, b) =>
+          new Date(b.orderDate) - new Date(a.orderDate)
+        );
+
+        console.log("Sorted Orders:", sortedOrders);
         setOrders(sortedOrders);
+        setCustomizeProducts(customizeProducts);
       } else {
-        console.error("Dữ liệu không hợp lệ!");
+        console.error("Không có dữ liệu đơn hàng hợp lệ");
+        setOrders([]);
       }
     } catch (err) {
       console.error("❌ Lỗi khi tải dữ liệu:", err);
@@ -76,28 +119,20 @@ const OrderTracking = () => {
   ];
 
   const getOrderStage = (orderId) => {
-    // Tìm tất cả các stages của order này
     const stages = orderStages.filter(stage => stage.orderId === orderId);
     if (stages.length === 0) return "Chờ xử lý";
-    
-    // Lấy stage mới nhất không phải trạng thái thanh toán
+
     const latestStage = stages
       .filter(stage => !["Đã thanh toán", "Chưa thanh toán"].includes(stage.orderStageName))
       .sort((a, b) => new Date(b.updatedDate) - new Date(a.updatedDate))[0];
-    
+
     return latestStage ? latestStage.orderStageName : "Chờ xử lý";
   };
 
-  const getPaymentStage = (orderId) => {
-    // Tìm tất cả các stages của order này
+  // Sửa lại hàm kiểm tra trạng thái Purchased
+  const isPurchased = (orderId) => {
     const stages = orderStages.filter(stage => stage.orderId === orderId);
-    
-    // Lấy stage thanh toán mới nhất
-    const paymentStage = stages
-      .filter(stage => ["Đã thanh toán", "Chưa thanh toán"].includes(stage.orderStageName))
-      .sort((a, b) => new Date(b.updatedDate) - new Date(a.updatedDate))[0];
-    
-    return paymentStage ? paymentStage.orderStageName : "Chưa thanh toán";
+    return stages.some(stage => stage.orderStageName === "Purchased");
   };
 
   const getStageStyle = (stage) => {
@@ -110,9 +145,8 @@ const OrderTracking = () => {
         return "bg-purple-100 text-purple-800 border-purple-200";
       case "Hoàn thành":
         return "bg-green-100 text-green-800 border-green-200";
-        case "Purchased":
-          return "bg-green-500 text-white border-green-600 shadow-lg transform scale-105 transition-transform hover:scale-110";
-        
+      case "Đã thanh toán":
+        return "bg-green-100 text-green-800 border-green-200";
       case "Chưa thanh toán":
         return "bg-yellow-100 text-yellow-800 border-yellow-200";
       default:
@@ -147,12 +181,6 @@ const OrderTracking = () => {
     setError(null);
 
     try {
-      const currentOrder = orders.find(o => o.orderId === orderId);
-      if (!currentOrder) {
-        throw new Error("Không tìm thấy thông tin đơn hàng");
-      }
-
-      // Tạo stage mới
       const response = await axiosInstance.post("/order-stages", {
         orderId: orderId,
         orderStageName: getStatusLabel(newStatus),
@@ -163,10 +191,8 @@ const OrderTracking = () => {
         throw new Error("Không nhận được phản hồi từ server");
       }
 
-      // Refresh order stages để lấy stage mới nhất
       await fetchOrderStages();
-      
-      // Reset selected status
+
       setSelectedStatus(prev => {
         const newStatus = { ...prev };
         delete newStatus[orderId];
@@ -188,72 +214,6 @@ const OrderTracking = () => {
     return option ? option.label : "Chờ xử lý";
   };
 
-  const getPaymentStatusStyle = (orderId) => {
-    const stages = orderStages.filter(stage => stage.orderId === orderId);
-    const paymentStage = stages.find(stage => 
-      stage.orderStageName === "Đã thanh toán" || stage.orderStageName === "Chưa thanh toán"
-    );
-
-    if (!paymentStage) return "bg-gray-100 text-gray-800 border-gray-200";
-    
-    switch (paymentStage.orderStageName) {
-      case "Đã thanh toán":
-        return "bg-green-100 text-green-800 border-green-200";
-      case "Chưa thanh toán":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
-      default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
-    }
-  };
-
-  const getPaymentStatusText = (orderId) => {
-    const stages = orderStages.filter(stage => stage.orderId === orderId);
-    const paymentStage = stages.find(stage => 
-      stage.orderStageName === "Đã thanh toán" || stage.orderStageName === "Chưa thanh toán"
-    );
-
-    if (!paymentStage) return "Chưa xác định";
-    return paymentStage.orderStageName;
-  };
-
-  const handleUpdatePaymentStatus = async (orderId, newStatus) => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      // Tạo stage mới cho trạng thái thanh toán
-      const response = await axiosInstance.post("/order-stages", {
-        orderId: orderId,
-        orderStageName: newStatus === 4 ? "Đã thanh toán" : "Chưa thanh toán",
-        updatedDate: new Date().toISOString()
-      });
-
-      if (!response.data) {
-        throw new Error("Không nhận được phản hồi từ server");
-      }
-
-      // Refresh order stages để lấy stage mới nhất
-      await fetchOrderStages();
-      
-      // Reset selected status
-      setSelectedStatus(prev => {
-        const newStatus = { ...prev };
-        delete newStatus[orderId];
-        return newStatus;
-      });
-
-      alert("Cập nhật trạng thái thanh toán thành công!");
-    } catch (error) {
-      console.error("Error updating payment status:", error);
-      setError("Không thể cập nhật trạng thái thanh toán. Vui lòng thử lại!");
-      alert("Có lỗi xảy ra khi cập nhật trạng thái thanh toán!");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (role !== "staff") return <h1 className="error">⚠ Bạn không có quyền truy cập</h1>;
-
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -261,7 +221,7 @@ const OrderTracking = () => {
           <div className="px-6 py-4 border-b border-gray-200">
             <h1 className="text-2xl font-bold text-gray-900">📦 Danh Sách Đơn Hàng</h1>
           </div>
-          
+
           {error && (
             <div className="bg-red-50 border-l-4 border-red-400 p-4 mx-4 mt-4">
               <div className="flex">
@@ -287,15 +247,16 @@ const OrderTracking = () => {
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ngày Đặt</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Người Nhận</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Địa Chỉ</th>
+                      {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sản Phẩm</th> */}
+                      {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Màu Sắc</th> */}
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phương Thức Giao</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Giá</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Số Lượng</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tổng Tiền</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Số điện thoại</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái đơn</th>
-                      {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái thanh toán</th> */}
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cập nhật</th>
-                      {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Chi Tiết</th> */}
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Chi Tiết</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
@@ -305,8 +266,14 @@ const OrderTracking = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(order.orderDate)}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{order.recipientName}</td>
                         <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">{order.deliveryAddress}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.shippingMethod}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{new Intl.NumberFormat('vi-VN').format(order.price)} VND</td>
+                        {/* <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
+                          {order.customizeProduct?.description || order.description || "N/A"}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {order.customizeProduct?.shirtColor || order.shirtColor || "N/A"}
+                        </td> */}
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.shippingMethod || "N/A"}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{new Intl.NumberFormat('vi-VN').format(order.price || 0)} VND</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{order.quantity}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">{new Intl.NumberFormat('vi-VN').format(order.totalPrice)} VND</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.notes || "N/A"}</td>
@@ -315,45 +282,50 @@ const OrderTracking = () => {
                             {getOrderStage(order.orderId)}
                           </span>
                         </td>
-                        {/* <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getStageStyle(getPaymentStage(order.orderId))}`}>
-                            {getPaymentStage(order.orderId)}
-                          </span>
-                        </td> */}
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center gap-2">
-                            <select
-                              className="border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                              value={selectedStatus[order.orderId] || ""}
-                              onChange={(e) => handleStatusChange(order.orderId, Number(e.target.value))}
-                              disabled={loading}
-                            >
-                              <option value="">Chọn trạng thái</option>
-                              {getOrderStatusOptions().map(option => (
-                                <option key={option.value} value={option.value}>
-                                  {option.label}
-                                </option>
-                              ))}
-                            </select>
-                            {selectedStatus[order.orderId] && (
-                              <button
-                                className={`bg-green-500 text-white px-2 py-1 rounded text-sm hover:bg-green-600 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                onClick={() => handleUpdateStatus(order.orderId)}
-                                disabled={loading}
-                              >
-                                {loading ? 'Đang cập nhật...' : 'Cập nhật'}
-                              </button>
+                            {!isPurchased(order.orderId) ? (
+                              <>
+                                <select
+                                  className="border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                  value={selectedStatus[order.orderId] || ""}
+                                  onChange={(e) => handleStatusChange(order.orderId, Number(e.target.value))}
+                                  disabled={loading}
+                                >
+                                  <option value="">Chọn trạng thái</option>
+                                  {getOrderStatusOptions().map(option => (
+                                    <option key={option.value} value={option.value}>
+                                      {option.label}
+                                    </option>
+                                  ))}
+                                </select>
+                                {selectedStatus[order.orderId] && (
+                                  <button
+                                    className={`bg-green-500 text-white px-2 py-1 rounded text-sm hover:bg-green-600 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                    onClick={() => handleUpdateStatus(order.orderId)}
+                                    disabled={loading}
+                                  >
+                                    {loading ? 'Đang cập nhật...' : 'Cập nhật'}
+                                  </button>
+                                )}
+                              </>
+                            ) : (
+                              <span className="text-gray-500 text-sm italic">Đã thanh toán</span>
                             )}
                           </div>
                         </td>
-                        {/* <td className="px-6 py-4 whitespace-nowrap">
-                          <button 
-                            className="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <button
+                            className="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2"
                             onClick={() => navigate(`/order-detail/${order.orderId}`)}
                           >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
                             Chi tiết
                           </button>
-                        </td> */}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -376,11 +348,10 @@ const OrderTracking = () => {
                     <button
                       onClick={() => paginate(currentPage - 1)}
                       disabled={currentPage === 1}
-                      className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
-                        currentPage === 1
+                      className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${currentPage === 1
                           ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                           : "bg-white text-gray-700 hover:bg-gray-50"
-                      }`}
+                        }`}
                     >
                       Trước
                     </button>
@@ -388,11 +359,10 @@ const OrderTracking = () => {
                       <button
                         key={index + 1}
                         onClick={() => paginate(index + 1)}
-                        className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium rounded-md ${
-                          currentPage === index + 1
+                        className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium rounded-md ${currentPage === index + 1
                             ? "bg-blue-500 text-white border-blue-500"
                             : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
-                        }`}
+                          }`}
                       >
                         {index + 1}
                       </button>
@@ -400,11 +370,10 @@ const OrderTracking = () => {
                     <button
                       onClick={() => paginate(currentPage + 1)}
                       disabled={currentPage === totalPages}
-                      className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${
-                        currentPage === totalPages
+                      className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${currentPage === totalPages
                           ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                           : "bg-white text-gray-700 hover:bg-gray-50"
-                      }`}
+                        }`}
                     >
                       Sau
                     </button>
