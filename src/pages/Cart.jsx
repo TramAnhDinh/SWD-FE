@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import axiosInstance from "../utils/axiosInstance";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Swal from "sweetalert2";
+import { Trash } from "lucide-react";
 
 const Cart = () => {
   const cartItems = useSelector((state) => state.cart?.items ?? []);
@@ -27,6 +29,25 @@ const Cart = () => {
   const [orderStage, setOrderStage] = useState("Chờ xử lý");
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("cod");
+
+  //Hỏi trước khi xoá sản phẩm
+  const handleRemoveItem = (productId) => {
+    Swal.fire({
+      title: "Bạn có chắc chắn?",
+      text: "Sản phẩm này sẽ bị xóa khỏi giỏ hàng!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Xóa",
+      cancelButtonText: "Hủy",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        dispatch(removeFromCart(productId));
+        Swal.fire("Đã xóa!", "Sản phẩm đã được xóa khỏi giỏ hàng.", "success");
+      }
+    });
+  };
 
   // Tính phí ship
   const shippingFee = shippingMethod === "Giao nhanh" ? 10000 : 0;
@@ -469,8 +490,11 @@ const Cart = () => {
                       </div>
                     </div>
                   </div>
-                  <button className="text-red-500" onClick={() => dispatch(removeFromCart(item.productId))}>
+                  {/* <button className="text-red-500" onClick={() => dispatch(removeFromCart(item.productId))}>
                     ❌ Xóa
+                  </button> */}
+                  <button onClick={() => handleRemoveItem(item.productId)}>
+                      <Trash size={20} className="text-red-500 cursor-pointer" />
                   </button>
                 </li>
               ))}
