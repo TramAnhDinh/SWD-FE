@@ -20,6 +20,27 @@ const Cart = () => {
     cartItems.reduce((acc, item) => ({ ...acc, [item.productId]: item.quantity }), {})
   );
 
+  //validation
+  // const validateOrder = () => {
+  //   if (!recipientName || !deliveryAddress || !notes) {
+  //     setError("Vui lòng nhập đầy đủ thông tin giao hàng!");
+  //     return false;
+  //   }
+  //   if (!/^\d{10}$/.test(phoneNumber)) {
+  //     setError("Số điện thoại phải có đúng 10 số!");
+  //     return false;
+  //   }
+  //   setError("");
+  //   return true;
+  // };
+
+  // const handleOrder = () => {
+  //   if (validateOrder()) {
+  //     alert("Đơn hàng hợp lệ! Tiến hành đặt hàng...");
+  //     // Gọi API hoặc xử lý đặt hàng tại đây
+  //   }
+  // };
+
   const [recipientName, setRecipientName] = useState("");
   const [deliveryAddress, setDeliveryAddress] = useState("");
   const [shippingMethod, setShippingMethod] = useState("Giao thường");
@@ -163,17 +184,30 @@ const Cart = () => {
     }
   };
 
-  // Thêm hàm xử lý hiển thị modal xác nhận
+  // Thêm hàm xử lý hiển thị modal xác nhận, validation
   const handleShowConfirm = () => {
-    if (!recipientName || !deliveryAddress || !shippingMethod) {
+    if (!recipientName || !deliveryAddress || !shippingMethod || !notes) {
       alert("Vui lòng nhập đầy đủ thông tin giao hàng!");
-      return;
+      return;  
     }
+    
 
     if (cartItems.length === 0) {
       alert("Giỏ hàng trống!");
       return;
     }
+    const phoneRegex = /^[0-9]{10,11}$/; // Chấp nhận số điện thoại 10-11 chữ số
+
+  if (!notes || notes.trim() === "") {
+    alert("Vui lòng nhập số điện thoại!");
+    return;
+  }
+
+  if (!phoneRegex.test(notes)) {
+    alert("Số điện thoại không hợp lệ! Vui lòng nhập 10-11 chữ số.");
+    return;
+  }
+    // setShowConfirmModal(true); // Mở modal nếu hợp lệ
 
     setShowConfirmModal(true);
   };
@@ -187,14 +221,25 @@ const Cart = () => {
         <div className="bg-white p-8 rounded-lg shadow-xl max-w-md w-full mx-4">
           <h3 className="text-2xl font-bold mb-4">Xác nhận đơn hàng</h3>
           
-          <div className="space-y-4">
+          {/* <div className="space-y-4">
             <div>
               <h4 className="font-semibold">Thông tin giao hàng:</h4>
               <p>Người nhận: {recipientName}</p>
               <p>Địa chỉ: {deliveryAddress}</p>
               <p>Phương thức giao hàng: {shippingMethod}</p>
               <p>Số điện thoại: {notes}</p>
-            </div>
+            </div> */}
+
+<div className="space-y-4">
+  <div>
+    <h4 className="font-semibold">Thông tin giao hàng:</h4>
+    <p>Người nhận: {recipientName || "Chưa nhập tên người nhận"}</p>
+    <p>Địa chỉ: {deliveryAddress || "Chưa nhập địa chỉ"}</p>
+    <p>Phương thức giao hàng: {shippingMethod || "Chưa chọn phương thức giao hàng"}</p>
+    <p>Số điện thoại: {notes || "Chưa nhập số điện thoại"}</p>
+  </div>
+
+
 
             <div>
               <h4 className="font-semibold">Chi tiết đơn hàng:</h4>
@@ -292,7 +337,7 @@ const Cart = () => {
               </div>
 
               <div className="space-y-3">
-                <button
+                {/* <button
                   onClick={() => {
                     setShowStatus(false);
                     navigate("/member", { 
@@ -314,7 +359,7 @@ const Cart = () => {
                   className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
                 >
                   Xem chi tiết đơn hàng
-                </button>
+                </button> */}
                 <button
                   onClick={() => {
                     setShowStatus(false);
