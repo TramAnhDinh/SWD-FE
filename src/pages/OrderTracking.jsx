@@ -281,12 +281,16 @@ const OrderTracking = () => {
                         
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getStageStyle(getOrderStage(order.orderId))}`}>
-                            {getOrderStage(order.orderId)}
+                            {getOrderStage(order.orderId) || "Chưa có trạng thái"}
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center gap-2">
-                          {getOrderStage(order.orderId) !== "Hoàn thành" && !isPurchased(order.orderId) ? (
+                          {getOrderStage(order.orderId) === "Hoàn thành" ? (
+                                <span className="text-gray-500 text-sm italic">Đã hoàn thành</span>
+                                  ) : isPurchased(order.orderId) ? (
+      <span className="text-green-500 text-sm italic">Đã thanh toán</span>
+                                    ) : (
                               <>
                                 <select
                                   className="border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -295,7 +299,12 @@ const OrderTracking = () => {
                                   disabled={loading}  
                                 >             
                                   <option value="">Chọn trạng thái</option>
-                                  {getOrderStatusOptions().map(option => (
+                                  {getOrderStatusOptions()
+                                  //  .filter(option => {
+                                  //   const currentStage = Number(getOrderStage(order.orderId));
+                                  //   return !isNaN(currentStage) && option.value >= currentStage;
+                                  // })
+                                  .map(option => (
                                     <option key={option.value} value={option.value}>
                                       {option.label}
                                     </option>
@@ -311,44 +320,47 @@ const OrderTracking = () => {
                                   </button>
                                 )}
                               </>
-                            ) : (
-                              <span className="text-gray-500 text-sm italic">Đã thanh toán</span>
                             )}
                           </div>
                         </td>
 
-                        {/* <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center gap-2">
-                            {getOrderStage(order.orderId) !== "Hoàn thành" && !isPurchased(order.orderId) ? (
-                              <>
-                          <select
-                             className="border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                              value={selectedStatus[order.orderId] || ""}
-                              onChange={(e) => handleStatusChange(order.orderId, Number(e.target.value))}
-                              disabled={loading}
-                          >
-                          <option value="">Chọn trạng thái</option>
-                            {getOrderStatusOptions().map(option => (
-                          <option key={option.value} value={option.value}>
-                            {option.label}
-                          </option>
-                          ))}
-                      </select>
-                          {selectedStatus[order.orderId] && (
-                      <button
-                           className={`bg-green-500 text-white px-2 py-1 rounded text-sm hover:bg-green-600 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                           onClick={() => handleUpdateStatus(order.orderId)}
-                           disabled={loading}
-                       >
-                       {loading ? 'Đang cập nhật...' : 'Cập nhật'}
-                     </button>
-                      )}
-                    </>
-                   ) : (
-                    <span className="text-gray-500 text-sm italic">Đã hoàn thành</span>
-                   )}
-                    </div>
-                      </td> */}
+{/* <td className="px-6 py-4 whitespace-nowrap">
+  <div className="flex items-center gap-2">
+    {getOrderStage(order.orderId) === "Hoàn thành" ? (
+      <span className="text-gray-500 text-sm italic">Đã hoàn thành</span>
+    ) : isPurchased(order.orderId) ? (
+      <span className="text-green-500 text-sm italic">Đã thanh toán</span>
+    ) : (
+      <>
+        <select
+          className="border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          value={selectedStatus[order.orderId] || ""}
+          onChange={(e) => handleStatusChange(order.orderId, Number(e.target.value))}
+          disabled={loading}  
+        >
+          <option value="">Chọn trạng thái</option>
+          {getOrderStatusOptions().map(option => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+        {selectedStatus[order.orderId] && (
+          <button
+            className={`bg-green-500 text-white px-2 py-1 rounded text-sm hover:bg-green-600 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+            onClick={() => handleUpdateStatus(order.orderId)}
+            disabled={loading}
+          >
+            {loading ? 'Đang cập nhật...' : 'Cập nhật'}
+          </button>
+        )}
+      </>
+    )}
+  </div>
+</td> */}
+
+
+                        
 
                       
                       
