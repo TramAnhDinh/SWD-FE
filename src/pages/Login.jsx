@@ -5,6 +5,8 @@ import { setUser } from "../redux/slices/userSlice";
 import { loadUserCart } from "../redux/slices/cartSlice";
 import axiosInstance from "../utils/axiosInstance";
 import { FaUser, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
+import xx from '../assets/xx.jpg';
+
 
 
 
@@ -100,8 +102,8 @@ const Login = () => {
     <section className="bg-[#dfa674] min-h-screen w-full flex items-center justify-center px-4 sm:px-6 lg:px-8">
       <div className="bg-[#dfa674] rounded-2xl flex max-w-7xl w-full mx-auto p-12 items-center min-h-[600px] ">
         <div className="w-full md:w-1/2 px-4 md:px-12">
-          <h2 className="font-bold text-4xl text-[#002D74]">Đăng nhập</h2>
-          <p className="text-lg mt-4 text-[#002D74]">Nếu bạn đã có tài khoản, hãy đăng nhập ngay.</p>
+          <h2 className="font-bold text-4xl text-[#915621]">Đăng nhập</h2>
+          <p className="text-lg mt-4 text-[#915621]">Nếu bạn đã có tài khoản, hãy đăng nhập ngay.</p>
           <form onSubmit={handleSubmit} className="flex flex-col gap-6 mt-12">
             <div className="relative">
               <FaUser className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 h-6 w-6" />
@@ -150,7 +152,7 @@ const Login = () => {
             )}
             <button
               type="submit"
-              className="bg-[#002D74] text-white py-3 rounded-xl hover:scale-105 duration-300 hover:bg-[#206ab1] font-medium text-lg"
+              className="bg-[#915621] text-white py-3 rounded-xl hover:scale-105 duration-300 hover:bg-[#002c7424] font-medium text-lg"
               disabled={loading}
             >
               {loading ? "Đang đăng nhập..." : "Đăng nhập"}
@@ -166,11 +168,11 @@ const Login = () => {
           </div>
           <div className="mt-6 text-base flex justify-between items-center">
             <p className="mr-3">Chưa có tài khoản?</p>
-            <a href="/register" className="bg-[#002D74] text-white py-3 px-8 rounded-xl hover:scale-110 hover:bg-[#002c7424] font-semibold duration-300">Đăng ký</a>
+            <a href="/register" className="bg-[#915621] text-white py-3 px-8 rounded-xl hover:scale-110 hover:bg-[#002c7424] font-semibold duration-300">Đăng ký</a>
           </div>
         </div>
         <div className="md:block hidden w-1/2 h-full">
-          <img className="rounded-2xl w-full h-[550px] object-cover" src="https://images.unsplash.com/photo-1552010099-5dc86fcfaa38?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NzEyNjZ8MHwxfHNlYXJjaHwxfHxmcmVzaHxlbnwwfDF8fHwxNzEyMTU4MDk0fDA&ixlib=rb-4.0.3&q=80&w=1080" alt="Login illustration" />
+          <img className="rounded-2xl w-full h-[550px] object-cover" src={xx} alt="Login illustration" />
         </div>
         {showResetModal && (
           <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">

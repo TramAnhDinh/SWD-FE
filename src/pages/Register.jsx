@@ -413,6 +413,9 @@
 
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import xx from '../assets/xx.jpg';
+
+
 
 const RegisterLogin = () => {
   const [isRegistering, setIsRegistering] = useState(true);
@@ -496,10 +499,10 @@ const RegisterLogin = () => {
     <section className="bg-[#dfa674] min-h-screen w-full flex items-center justify-center px-4 sm:px-6 lg:px-8">
       <div className="bg-[#dfa674] rounded-2xl flex max-w-7xl w-full mx-auto p-12 items-center min-h-[600px] ">
         <div className="w-full md:w-1/2 px-4 md:px-12">
-          <h2 className="font-bold text-4xl text-[#002D74]">
+          <h2 className="font-bold text-4xl text-[#915621]">
             {isRegistering ? "Đăng ký" : "Đăng nhập"}
           </h2>
-          <p className="text-lg mt-4 text-[#002D74]">
+          <p className="text-lg mt-4 text-[#915621]">
             {isRegistering ? "Tạo tài khoản mới" : "Nếu bạn đã có tài khoản, hãy đăng nhập ngay."}
           </p>
           <form onSubmit={handleAuth} className="flex flex-col gap-6 mt-12">
@@ -602,7 +605,7 @@ const RegisterLogin = () => {
 
             <button
               type="submit"
-              className="bg-[#002D74] text-white py-3 rounded-xl hover:scale-105 duration-300 hover:bg-[#206ab1] font-medium text-lg"
+              className="bg-[#915621] text-white py-3 rounded-xl hover:scale-105 duration-300 hover:bg-[#002c7424] font-medium text-lg"
             >
               {isRegistering ? "Đăng ký" : "Đăng nhập"}
             </button>
@@ -614,7 +617,7 @@ const RegisterLogin = () => {
             </p>
             <button
               onClick={() => setIsRegistering(!isRegistering)}
-              className="bg-[#002D74] text-white py-3 px-8 rounded-xl hover:scale-110 hover:bg-[#206ab1] font-semibold duration-300"
+              className="bg-[#915621] text-white py-3 px-8 rounded-xl hover:scale-110 hover:bg-[#002c7424] font-semibold duration-300"
             >
               {isRegistering ? "Đăng nhập" : "Đăng ký"}
             </button>
@@ -624,7 +627,7 @@ const RegisterLogin = () => {
         <div className="md:block hidden w-1/2 h-full">
           <img
             className="rounded-2xl w-full h-[550px] object-cover"
-            src="https://images.unsplash.com/photo-1552010099-5dc86fcfaa38?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NzEyNjZ8MHwxfHNlYXJjaHwxfHxmcmVzaHxlbnwwfDF8fHwxNzEyMTU4MDk0fDA&ixlib=rb-4.0.3&q=80&w=1080"
+            src={xx}
             alt="Register illustration"
           />
         </div>
