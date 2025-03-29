@@ -286,15 +286,14 @@ const OrderTracking = () => {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center gap-2">
-                            {!isPurchased(order.orderId) ? (
+                          {getOrderStage(order.orderId) !== "Hoàn thành" && !isPurchased(order.orderId) ? (
                               <>
                                 <select
                                   className="border rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                   value={selectedStatus[order.orderId] || ""}
                                   onChange={(e) => handleStatusChange(order.orderId, Number(e.target.value))}
                                   disabled={loading}  
-                                >
-                                
+                                >             
                                   <option value="">Chọn trạng thái</option>
                                   {getOrderStatusOptions().map(option => (
                                     <option key={option.value} value={option.value}>
@@ -350,6 +349,9 @@ const OrderTracking = () => {
                    )}
                     </div>
                       </td> */}
+
+                      
+                      
                         <td className="px-6 py-4 whitespace-nowrap">
                           <button
                             className="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2"
