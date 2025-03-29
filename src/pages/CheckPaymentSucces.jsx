@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaCheckCircle, FaHome, FaShoppingBag } from 'react-icons/fa';
 import { clearCart } from '../redux/slices/cartSlice';
+import { useDispatch } from 'react-redux';
 
 const CheckPaymentSuccess = () => {
   const navigate = useNavigate();
