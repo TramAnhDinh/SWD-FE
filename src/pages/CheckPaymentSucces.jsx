@@ -1,18 +1,22 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaCheckCircle, FaHome, FaShoppingBag } from 'react-icons/fa';
+import { clearCart } from '../redux/slices/cartSlice';
 
 const CheckPaymentSuccess = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   useEffect(() => {
+    // Xóa giỏ hàng sau khi thanh toán thành công
+    dispatch(clearCart());
     // Tự động chuyển hướng sau 5 giây
     const timer = setTimeout(() => {
       navigate('/member');
     }, 5000);
 
     return () => clearTimeout(timer);
-  }, [navigate]);
+  }, [dispatch, navigate]);
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -31,13 +35,13 @@ const CheckPaymentSuccess = () => {
           </p>
 
           <div className="space-y-4">
-            <button
+            {/* <button
               onClick={() => navigate('/member')}
               className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
             >
               <FaShoppingBag />
               Xem Đơn Hàng
-            </button>
+            </button> */}
 
             <button
               onClick={() => navigate('/')}
