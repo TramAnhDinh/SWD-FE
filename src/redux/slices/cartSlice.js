@@ -84,8 +84,13 @@ const cartSlice = createSlice({
         item.quantity = Math.max(quantity, 10); // Giữ số lượng tối thiểu là 10
         item.totalPrice = item.price * item.quantity; // Cập nhật tổng giá tiền ngay
         console.log("Cập nhật số lượng sản phẩm:", item);
-        saveCartToStorage(state.items);
+        // saveCartToStorage(state.items);
       }
+      // Cập nhật tổng tiền của giỏ hàng
+    state.totalPrice = state.items.reduce((total, item) => total + item.totalPrice, 0);
+
+    saveCartToStorage(state.items);
+    console.log("Tổng giá giỏ hàng sau khi cập nhật:", state.totalPrice);
     },
 
     // Add new action to load cart for specific user
