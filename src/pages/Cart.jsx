@@ -660,20 +660,35 @@ const Cart = () => {
   
 
   // Xử lý thay đổi số lượng
-  const handleQuantityChange = (productId, newQuantity) => {
-    // if (newQuantity < 1) return;
+  // const handleQuantityChange = (productId, newQuantity) => {
+  //   // if (newQuantity < 1) return;
 
-    // setQuantities((prev) => ({
-    //   ...prev,
-    //   [productId]: newQuantity,
-    // }));
+  //   // setQuantities((prev) => ({
+  //   //   ...prev,
+  //   //   [productId]: newQuantity,
+  //   // }));
+  //   setQuantities((prev) => ({
+  //     ...prev,
+  //     [productId]: Math.max(newQuantity, 10) // Giữ số lượng tối thiểu là 10
+  //   }));
+
+  //   dispatch(updateQuantity({ productId, quantity: Math.max(newQuantity, 10) }));
+  // };
+
+  const handleQuantityChange = (productId, newQuantity) => {
+    const updatedQuantity = Math.max(newQuantity, 10); // Đảm bảo số lượng tối thiểu là 10
+
     setQuantities((prev) => ({
       ...prev,
-      [productId]: Math.max(newQuantity, 10) // Giữ số lượng tối thiểu là 10
+      [productId]: updatedQuantity
     }));
 
-    dispatch(updateQuantity({ productId, quantity: Math.max(newQuantity, 10) }));
-  };
+    dispatch(updateQuantity({ 
+      productId, 
+      quantity: updatedQuantity,
+      // totalPrice: updatedQuantity * getProductPrice(productId) // Cập nhật totalPrice
+    }));
+};
 
   
   // Xử lý thanh toán VNPAY
