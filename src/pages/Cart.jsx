@@ -15,31 +15,17 @@ const Cart = () => {
   const navigate = useNavigate();
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
-  // State lưu số lượng cho từng sản phẩm
+  // State lưu số lượng cho từng sản phẩm phải mua 10 sản phẩm
+  // const [quantities, setQuantities] = useState(
+  //   cartItems.reduce((acc, item) => ({ ...acc, [item.productId]: item.quantity }), {})
+  // );
   const [quantities, setQuantities] = useState(
-    cartItems.reduce((acc, item) => ({ ...acc, [item.productId]: item.quantity }), {})
+    cartItems.reduce(
+      (acc, item) => ({ ...acc, [item.productId]: Math.max(item.quantity, 10) }),
+      {}
+    )
   );
-
-  //validation
-  // const validateOrder = () => {
-  //   if (!recipientName || !deliveryAddress || !notes) {
-  //     setError("Vui lòng nhập đầy đủ thông tin giao hàng!");
-  //     return false;
-  //   }
-  //   if (!/^\d{10}$/.test(phoneNumber)) {
-  //     setError("Số điện thoại phải có đúng 10 số!");
-  //     return false;
-  //   }
-  //   setError("");
-  //   return true;
-  // };
-
-  // const handleOrder = () => {
-  //   if (validateOrder()) {
-  //     alert("Đơn hàng hợp lệ! Tiến hành đặt hàng...");
-  //     // Gọi API hoặc xử lý đặt hàng tại đây
-  //   }
-  // };
+  
 
   const [recipientName, setRecipientName] = useState("");
   const [deliveryAddress, setDeliveryAddress] = useState("");
@@ -79,11 +65,15 @@ const Cart = () => {
 
   // Xử lý thay đổi số lượng
   const handleQuantityChange = (productId, newQuantity) => {
-    if (newQuantity < 1) return;
+    // if (newQuantity < 1) return;
 
+    // setQuantities((prev) => ({
+    //   ...prev,
+    //   [productId]: newQuantity,
+    // }));
     setQuantities((prev) => ({
       ...prev,
-      [productId]: newQuantity,
+      [productId]: Math.max(newQuantity, 10) // Giữ số lượng tối thiểu là 10
     }));
 
     dispatch(updateQuantity({ productId, quantity: newQuantity }));
@@ -230,15 +220,14 @@ const Cart = () => {
               <p>Số điện thoại: {notes}</p>
             </div> */}
 
-<div className="space-y-4">
-  <div>
-    <h4 className="font-semibold">Thông tin giao hàng:</h4>
-    <p>Người nhận: {recipientName || "Chưa nhập tên người nhận"}</p>
-    <p>Địa chỉ: {deliveryAddress || "Chưa nhập địa chỉ"}</p>
-    <p>Phương thức giao hàng: {shippingMethod || "Chưa chọn phương thức giao hàng"}</p>
-    <p>Số điện thoại: {notes || "Chưa nhập số điện thoại"}</p>
-  </div>
-
+            <div className="space-y-4">
+              <div>
+                <h4 className="font-semibold">Thông tin giao hàng:</h4>
+                <p>Người nhận: {recipientName || "Chưa nhập tên người nhận"}</p>
+                <p>Địa chỉ: {deliveryAddress || "Chưa nhập địa chỉ"}</p>
+                <p>Phương thức giao hàng: {shippingMethod || "Chưa chọn phương thức giao hàng"}</p>
+                <p>Số điện thoại: {notes || "Chưa nhập số điện thoại"}</p>
+            </div>
 
 
             <div>
@@ -473,6 +462,7 @@ const Cart = () => {
                         <button
                           onClick={() => handleQuantityChange(item.productId, quantities[item.productId] - 1)}
                           className="bg-gray-300 px-2 py-1 rounded"
+                          disabled={quantities[item.productId] <= 10} // Không cho giảm dưới 10
                         >
                           ➖
                         </button>
@@ -481,6 +471,7 @@ const Cart = () => {
                           value={quantities[item.productId]}
                           onChange={(e) => handleQuantityChange(item.productId, Number(e.target.value))}
                           className="w-12 text-center mx-2 border rounded"
+                          min="10" // Chặn nhập số nhỏ hơn 10
                         />
                         <button
                           onClick={() => handleQuantityChange(item.productId, quantities[item.productId] + 1)}
