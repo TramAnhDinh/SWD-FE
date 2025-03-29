@@ -493,13 +493,16 @@ const RegisterLogin = () => {
   };
 
   return (
-    <section className="bg-gray-100 min-h-screen flex justify-center items-center px-6">
-      <div className="bg-[#dfa674] rounded-2xl flex max-w-3xl p-5 items-center shadow-lg w-full">
-        <div className="w-full md:w-1/2 px-8">
-          <h2 className="font-bold text-3xl text-[#002D74]">
+    <section className="bg-[#dfa674] min-h-screen w-full flex items-center justify-center px-4 sm:px-6 lg:px-8">
+      <div className="bg-[#dfa674] rounded-2xl flex max-w-7xl w-full mx-auto p-12 items-center min-h-[600px] ">
+        <div className="w-full md:w-1/2 px-4 md:px-12">
+          <h2 className="font-bold text-4xl text-[#002D74]">
             {isRegistering ? "Đăng ký" : "Đăng nhập"}
           </h2>
-          <form onSubmit={handleAuth} className="flex flex-col gap-4 mt-4">
+          <p className="text-lg mt-4 text-[#002D74]">
+            {isRegistering ? "Tạo tài khoản mới" : "Nếu bạn đã có tài khoản, hãy đăng nhập ngay."}
+          </p>
+          <form onSubmit={handleAuth} className="flex flex-col gap-6 mt-12">
             {isRegistering && (
               <input
                 type="text"
@@ -507,7 +510,7 @@ const RegisterLogin = () => {
                 placeholder="Tên đăng nhập"
                 value={formData.username}
                 onChange={handleChange}
-                className="p-2 rounded-xl border"
+                className="pl-12 pr-4 py-3 w-full border rounded-xl text-lg"
                 required
               />
             )}
@@ -519,10 +522,10 @@ const RegisterLogin = () => {
               placeholder="Email"
               value={formData.email}
               onChange={handleChange}
-              className="p-2 rounded-xl border"
+              className="pl-12 pr-4 py-3 w-full border rounded-xl text-lg"
               required
             />
-            {errors.email && <p className="text-red-500 text-xs">{errors.email}</p>}
+            {errors.email && <p className="text-red-500 text-base">{errors.email}</p>}
 
             {/* Password */}
             <input
@@ -531,7 +534,7 @@ const RegisterLogin = () => {
               placeholder="Mật khẩu"
               value={formData.password}
               onChange={handleChange}
-              className="p-2 rounded-xl border"
+              className="pl-12 pr-4 py-3 w-full border rounded-xl text-lg"
               required
             />
 
@@ -544,7 +547,7 @@ const RegisterLogin = () => {
                   placeholder="Họ và tên"
                   value={formData.fullName}
                   onChange={handleChange}
-                  className="p-2 rounded-xl border"
+                  className="pl-12 pr-4 py-3 w-full border rounded-xl text-lg"
                   required
                 />
 
@@ -553,7 +556,7 @@ const RegisterLogin = () => {
                   name="gender"
                   value={formData.gender}
                   onChange={handleChange}
-                  className="p-2 rounded-xl border"
+                  className="pl-12 pr-4 py-3 w-full border rounded-xl text-lg bg-white"
                 >
                   <option value="true">Nam</option>
                   <option value="false">Nữ</option>
@@ -565,7 +568,7 @@ const RegisterLogin = () => {
                   name="dateOfBirth"
                   value={formData.dateOfBirth}
                   onChange={handleChange}
-                  className="p-2 rounded-xl border"
+                  className="pl-12 pr-4 py-3 w-full border rounded-xl text-lg"
                   required
                 />
 
@@ -576,7 +579,7 @@ const RegisterLogin = () => {
                   placeholder="Địa chỉ"
                   value={formData.address}
                   onChange={handleChange}
-                  className="p-2 rounded-xl border"
+                  className="pl-12 pr-4 py-3 w-full border rounded-xl text-lg"
                   required
                 />
 
@@ -587,40 +590,42 @@ const RegisterLogin = () => {
                   placeholder="Số điện thoại"
                   value={formData.phone}
                   onChange={handleChange}
-                  className="p-2 rounded-xl border"
+                  className="pl-12 pr-4 py-3 w-full border rounded-xl text-lg"
                   required
                 />
-                {errors.phone && <p className="text-red-500 text-xs">{errors.phone}</p>}
+                {errors.phone && <p className="text-red-500 text-base">{errors.phone}</p>}
               </>
             )}
 
             {/* Hiển thị lỗi chung */}
-            {error && <p className="text-red-500 text-sm">{error}</p>}
+            {error && <p className="text-red-500 text-base">{error}</p>}
 
             <button
               type="submit"
-              className="bg-[#002D74] text-white py-2 rounded-xl hover:scale-105 duration-300"
+              className="bg-[#002D74] text-white py-3 rounded-xl hover:scale-105 duration-300 hover:bg-[#206ab1] font-medium text-lg"
             >
               {isRegistering ? "Đăng ký" : "Đăng nhập"}
             </button>
           </form>
 
-          <p className="text-sm mt-4">
-            {isRegistering ? "Đã có tài khoản?" : "Chưa có tài khoản?"}{" "}
+          <div className="mt-8 text-base flex justify-between items-center">
+            <p className="mr-3">
+              {isRegistering ? "Đã có tài khoản?" : "Chưa có tài khoản?"}
+            </p>
             <button
               onClick={() => setIsRegistering(!isRegistering)}
-              className="text-indigo-600 hover:underline"
+              className="bg-[#002D74] text-white py-3 px-8 rounded-xl hover:scale-110 hover:bg-[#206ab1] font-semibold duration-300"
             >
               {isRegistering ? "Đăng nhập" : "Đăng ký"}
             </button>
-          </p>
+          </div>
         </div>
 
-        <div className="hidden md:block w-1/2">
+        <div className="md:block hidden w-1/2 h-full">
           <img
-            className="rounded-2xl max-h-[600px]"
+            className="rounded-2xl w-full h-[550px] object-cover"
             src="https://images.unsplash.com/photo-1552010099-5dc86fcfaa38?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NzEyNjZ8MHwxfHNlYXJjaHwxfHxmcmVzaHxlbnwwfDF8fHwxNzEyMTU4MDk0fDA&ixlib=rb-4.0.3&q=80&w=1080"
-            alt="form background"
+            alt="Register illustration"
           />
         </div>
       </div>

@@ -239,9 +239,9 @@ const OrderDetail = () => {
                         <p className="text-gray-600">
                           <span className="font-medium">Mô tả:</span> {order.description || "N/A"}
                         </p>
-                        <p className="text-gray-600">
-                          <span className="font-medium">Mô tả tùy chỉnh:</span> {order.customDescription || "N/A"}
-                        </p>
+                        {/* <p className="text-gray-600"> */}
+                          {/* <span className="font-medium">Mô tả tùy chỉnh:</span> {order.customDescription || "N/A"} */}
+                        {/* </p> */}
                         <p className="text-gray-600">
                           <span className="font-medium">Màu áo:</span> {order.shirtColor || "N/A"}
                         </p>
