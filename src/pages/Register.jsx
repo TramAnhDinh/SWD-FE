@@ -291,51 +291,204 @@
 
 // export default RegisterLogin;
 
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { FaUser, FaEnvelope, FaLock, FaUserCircle, FaVenusMars, FaCalendar, FaMapMarkerAlt, FaPhone } from 'react-icons/fa';
+// import React, { useState } from 'react';
+// import { useNavigate } from 'react-router-dom';
+// import { FaUser, FaEnvelope, FaLock, FaUserCircle, FaVenusMars, FaCalendar, FaMapMarkerAlt, FaPhone } from 'react-icons/fa';
+
+// const RegisterLogin = () => {
+//   const [isRegistering, setIsRegistering] = useState(true);
+//   const [formData, setFormData] = useState({
+//     username: '',
+//     email: '',
+//     password: '',
+//     fullName: '',
+//     gender: true,
+//     dateOfBirth: '',
+//     address: '',
+//     phone: '',
+//     avatar: '1',
+//     roleName: ''
+//   });
+//   const [errors, setErrors] = useState({
+//     email: "",
+//     phone: "",
+//   });
+
+
+//   const [error, setError] = useState('');
+//   const navigate = useNavigate();
+
+//   const handleChange = (e) => {
+//     const { name, value } = e.target;
+//     setFormData({ ...formData, [name]: name === "gender" ? value === "true" : value });
+//     // Kiểm tra email
+//     if (name === "email") {
+//       const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+//       setErrors((prev) => ({
+//         ...prev,
+//         email: emailPattern.test(value) ? "" : "Email không hợp lệ!",
+//       }));
+//     }
+
+//     // Kiểm tra số điện thoại (phải có 10 số)
+//     if (name === "phone") {
+//       setErrors((prev) => ({
+//         ...prev,
+//         phone: /^\d{10}$/.test(value) ? "" : "Số điện thoại phải có đúng 10 chữ số!",
+//       }));
+//     }
+//   };
+
+
+//   const handleAuth = async (e) => {
+//     e.preventDefault();
+//     setError('');
+//      // Kiểm tra nếu còn lỗi thì không submit
+//      if (errors.email || errors.phone) {
+//       setError("Vui lòng sửa lỗi trước khi tiếp tục!");
+//       return;
+//     }
+//     try {
+//       const url = isRegistering ? 'https://phamdangtuc-001-site1.ntempurl.com/api/users' : 'https://phamdangtuc-001-site1.ntempurl.com/api/login';
+//       const response = await fetch(url, {
+//         method: 'POST',
+//         headers: { 'Content-Type': 'application/json' },
+//         body: JSON.stringify(formData)
+//       });
+//       if (!response.ok) {
+//         const errorData = await response.json();
+//         throw new Error(errorData.message || 'Thao tác thất bại, vui lòng thử lại!');
+//       }
+//       alert(isRegistering ? 'Đăng ký thành công!' : 'Đăng nhập thành công!');
+//       navigate('/');
+//     } catch (err) {
+//       setError(err.message || 'Lỗi kết nối đến máy chủ!');
+//     }
+//   };
+
+//   return (
+//     <section className="bg-gray-100 min-h-screen flex justify-center items-center px-6">
+//       <div className="bg-[#dfa674] rounded-2xl flex max-w-3xl p-5 items-center shadow-lg w-full">
+//         <div className="w-full md:w-1/2 px-8">
+//           <h2 className="font-bold text-3xl text-[#002D74]">{isRegistering ? 'Đăng ký' : 'Đăng nhập'}</h2>
+//           <form onSubmit={handleAuth} className="flex flex-col gap-4 mt-4">
+//             {isRegistering && (
+//               <input type="text" name="username" placeholder="Tên đăng nhập" value={formData.username} onChange={handleChange} className="p-2 rounded-xl border" required />
+//             )}
+//             <input type="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} className="p-2 rounded-xl border" required />
+//             <input type="password" name="password" placeholder="Mật khẩu" value={formData.password} onChange={handleChange} className="p-2 rounded-xl border" required />
+//             {isRegistering && (
+//               <>
+//                 <input type="text" name="fullName" placeholder="Họ và tên" value={formData.fullName} onChange={handleChange} className="p-2 rounded-xl border" required />
+//                 <select name="gender" value={formData.gender} onChange={handleChange} className="p-2 rounded-xl border">
+//                   <option value="true">Nam</option>
+//                   <option value="false">Nữ</option>
+//                 </select>
+//                 <input type="date" name="dateOfBirth" value={formData.dateOfBirth} onChange={handleChange} className="p-2 rounded-xl border" required />
+//                 <input type="text" name="address" placeholder="Địa chỉ" value={formData.address} onChange={handleChange} className="p-2 rounded-xl border" required />
+//                 <input type="text" name="phone" placeholder="Số điện thoại" value={formData.phone} onChange={handleChange} className="p-2 rounded-xl border" required />
+//               </>
+//             )}
+//             {error && <p className="text-red-500 text-sm">{error}</p>}
+//             <button type="submit" className="bg-[#002D74] text-white py-2 rounded-xl hover:scale-105 duration-300">
+//               {isRegistering ? 'Đăng ký' : 'Đăng nhập'}
+//             </button>
+//           </form>
+//           <p className="text-sm mt-4">
+//             {isRegistering ? 'Đã có tài khoản?' : 'Chưa có tài khoản?'}{' '}
+//             <button onClick={() => setIsRegistering(!isRegistering)} className="text-indigo-600 hover:underline">
+//               {isRegistering ? 'Đăng nhập' : 'Đăng ký'}
+//             </button>
+//           </p>
+//         </div>
+//         <div className="hidden md:block w-1/2">
+//           <img className="rounded-2xl max-h-[600px]" src="https://images.unsplash.com/photo-1552010099-5dc86fcfaa38?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NzEyNjZ8MHwxfHNlYXJjaHwxfHxmcmVzaHxlbnwwfDF8fHwxNzEyMTU4MDk0fDA&ixlib=rb-4.0.3&q=80&w=1080" alt="form background" />
+//         </div>
+//       </div>
+//     </section>
+//   );
+// };
+
+// export default RegisterLogin;
+
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const RegisterLogin = () => {
   const [isRegistering, setIsRegistering] = useState(true);
   const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    password: '',
-    fullName: '',
+    username: "",
+    email: "",
+    password: "",
+    fullName: "",
     gender: true,
-    dateOfBirth: '',
-    address: '',
-    phone: '',
-    avatar: '1',
-    roleName: ''
+    dateOfBirth: "",
+    address: "",
+    phone: "",
+    avatar: "1",
+    roleName: "",
   });
 
-  const [error, setError] = useState('');
+  const [errors, setErrors] = useState({
+    email: "",
+    phone: "",
+  });
+
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: name === "gender" ? value === "true" : value });
+
+    // Kiểm tra email
+    if (name === "email") {
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      setErrors((prev) => ({
+        ...prev,
+        email: emailPattern.test(value) ? "" : "Email không hợp lệ!",
+      }));
+    }
+
+    // Kiểm tra số điện thoại (phải có 10 số)
+    if (name === "phone") {
+      setErrors((prev) => ({
+        ...prev,
+        phone: /^\d{10}$/.test(value) ? "" : "Số điện thoại phải có đúng 10 chữ số!",
+      }));
+    }
   };
 
   const handleAuth = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
+
+    // Kiểm tra nếu còn lỗi thì không submit
+    if (errors.email || errors.phone) {
+      setError("Vui lòng sửa lỗi trước khi tiếp tục!");
+      return;
+    }
+
     try {
-      const url = isRegistering ? 'https://phamdangtuc-001-site1.ntempurl.com/api/users' : 'https://phamdangtuc-001-site1.ntempurl.com/api/login';
+      const url = isRegistering
+        ? "https://phamdangtuc-001-site1.ntempurl.com/api/users"
+        : "https://phamdangtuc-001-site1.ntempurl.com/api/login";
+
       const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
       });
+
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Thao tác thất bại, vui lòng thử lại!');
+        throw new Error(errorData.message || "Thao tác thất bại, vui lòng thử lại!");
       }
-      alert(isRegistering ? 'Đăng ký thành công!' : 'Đăng nhập thành công!');
-      navigate('/');
+
+      alert(isRegistering ? "Đăng ký thành công!" : "Đăng nhập thành công!");
+      navigate("/");
     } catch (err) {
-      setError(err.message || 'Lỗi kết nối đến máy chủ!');
+      setError(err.message || "Lỗi kết nối đến máy chủ!");
     }
   };
 
@@ -343,39 +496,132 @@ const RegisterLogin = () => {
     <section className="bg-gray-100 min-h-screen flex justify-center items-center px-6">
       <div className="bg-[#dfa674] rounded-2xl flex max-w-3xl p-5 items-center shadow-lg w-full">
         <div className="w-full md:w-1/2 px-8">
-          <h2 className="font-bold text-3xl text-[#002D74]">{isRegistering ? 'Đăng ký' : 'Đăng nhập'}</h2>
+          <h2 className="font-bold text-3xl text-[#002D74]">
+            {isRegistering ? "Đăng ký" : "Đăng nhập"}
+          </h2>
           <form onSubmit={handleAuth} className="flex flex-col gap-4 mt-4">
             {isRegistering && (
-              <input type="text" name="username" placeholder="Tên đăng nhập" value={formData.username} onChange={handleChange} className="p-2 rounded-xl border" required />
+              <input
+                type="text"
+                name="username"
+                placeholder="Tên đăng nhập"
+                value={formData.username}
+                onChange={handleChange}
+                className="p-2 rounded-xl border"
+                required
+              />
             )}
-            <input type="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} className="p-2 rounded-xl border" required />
-            <input type="password" name="password" placeholder="Mật khẩu" value={formData.password} onChange={handleChange} className="p-2 rounded-xl border" required />
+
+            {/* Email */}
+            <input
+              type="email"
+              name="email"
+              placeholder="Email"
+              value={formData.email}
+              onChange={handleChange}
+              className="p-2 rounded-xl border"
+              required
+            />
+            {errors.email && <p className="text-red-500 text-xs">{errors.email}</p>}
+
+            {/* Password */}
+            <input
+              type="password"
+              name="password"
+              placeholder="Mật khẩu"
+              value={formData.password}
+              onChange={handleChange}
+              className="p-2 rounded-xl border"
+              required
+            />
+
             {isRegistering && (
               <>
-                <input type="text" name="fullName" placeholder="Họ và tên" value={formData.fullName} onChange={handleChange} className="p-2 rounded-xl border" required />
-                <select name="gender" value={formData.gender} onChange={handleChange} className="p-2 rounded-xl border">
+                {/* Full Name */}
+                <input
+                  type="text"
+                  name="fullName"
+                  placeholder="Họ và tên"
+                  value={formData.fullName}
+                  onChange={handleChange}
+                  className="p-2 rounded-xl border"
+                  required
+                />
+
+                {/* Gender */}
+                <select
+                  name="gender"
+                  value={formData.gender}
+                  onChange={handleChange}
+                  className="p-2 rounded-xl border"
+                >
                   <option value="true">Nam</option>
                   <option value="false">Nữ</option>
                 </select>
-                <input type="date" name="dateOfBirth" value={formData.dateOfBirth} onChange={handleChange} className="p-2 rounded-xl border" required />
-                <input type="text" name="address" placeholder="Địa chỉ" value={formData.address} onChange={handleChange} className="p-2 rounded-xl border" required />
-                <input type="text" name="phone" placeholder="Số điện thoại" value={formData.phone} onChange={handleChange} className="p-2 rounded-xl border" required />
+
+                {/* Date of Birth */}
+                <input
+                  type="date"
+                  name="dateOfBirth"
+                  value={formData.dateOfBirth}
+                  onChange={handleChange}
+                  className="p-2 rounded-xl border"
+                  required
+                />
+
+                {/* Address */}
+                <input
+                  type="text"
+                  name="address"
+                  placeholder="Địa chỉ"
+                  value={formData.address}
+                  onChange={handleChange}
+                  className="p-2 rounded-xl border"
+                  required
+                />
+
+                {/* Phone */}
+                <input
+                  type="text"
+                  name="phone"
+                  placeholder="Số điện thoại"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  className="p-2 rounded-xl border"
+                  required
+                />
+                {errors.phone && <p className="text-red-500 text-xs">{errors.phone}</p>}
               </>
             )}
+
+            {/* Hiển thị lỗi chung */}
             {error && <p className="text-red-500 text-sm">{error}</p>}
-            <button type="submit" className="bg-[#002D74] text-white py-2 rounded-xl hover:scale-105 duration-300">
-              {isRegistering ? 'Đăng ký' : 'Đăng nhập'}
+
+            <button
+              type="submit"
+              className="bg-[#002D74] text-white py-2 rounded-xl hover:scale-105 duration-300"
+            >
+              {isRegistering ? "Đăng ký" : "Đăng nhập"}
             </button>
           </form>
+
           <p className="text-sm mt-4">
-            {isRegistering ? 'Đã có tài khoản?' : 'Chưa có tài khoản?'}{' '}
-            <button onClick={() => setIsRegistering(!isRegistering)} className="text-indigo-600 hover:underline">
-              {isRegistering ? 'Đăng nhập' : 'Đăng ký'}
+            {isRegistering ? "Đã có tài khoản?" : "Chưa có tài khoản?"}{" "}
+            <button
+              onClick={() => setIsRegistering(!isRegistering)}
+              className="text-indigo-600 hover:underline"
+            >
+              {isRegistering ? "Đăng nhập" : "Đăng ký"}
             </button>
           </p>
         </div>
+
         <div className="hidden md:block w-1/2">
-          <img className="rounded-2xl max-h-[600px]" src="https://images.unsplash.com/photo-1552010099-5dc86fcfaa38?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NzEyNjZ8MHwxfHNlYXJjaHwxfHxmcmVzaHxlbnwwfDF8fHwxNzEyMTU4MDk0fDA&ixlib=rb-4.0.3&q=80&w=1080" alt="form background" />
+          <img
+            className="rounded-2xl max-h-[600px]"
+            src="https://images.unsplash.com/photo-1552010099-5dc86fcfaa38?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NzEyNjZ8MHwxfHNlYXJjaHwxfHxmcmVzaHxlbnwwfDF8fHwxNzEyMTU4MDk0fDA&ixlib=rb-4.0.3&q=80&w=1080"
+            alt="form background"
+          />
         </div>
       </div>
     </section>
