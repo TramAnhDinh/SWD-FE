@@ -1,4 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { toast } from "react-toastify";
+
 
 // const API_URL = "https://localhost:7163/api/Product";
 const API_URL = "https://phamdangtuc-001-site1.ntempurl.com/api/Product";
@@ -49,8 +51,23 @@ export const deleteProduct = createAsyncThunk(
 // Thêm sản phẩm
 export const addProduct = createAsyncThunk("products/addProduct", async (product, { dispatch, rejectWithValue }) => {
   try {
-    if (!product.categoryId) return rejectWithValue("Danh mục sản phẩm là bắt buộc!");
-
+    // ❌ Kiểm tra dữ liệu đầu vào trước khi gửi API
+    if (!product.productName) {
+      toast.error("⚠️ Tên sản phẩm là bắt buộc!");
+      return rejectWithValue("Tên sản phẩm là bắt buộc!");
+    }
+    if (!product.categoryId) {
+      toast.error("⚠️ Danh mục sản phẩm là bắt buộc!");
+      return rejectWithValue("Danh mục sản phẩm là bắt buộc!");
+    }
+    if (!product.price || Number(product.price) <= 0) {
+      toast.error("⚠️ Giá tiền phải lớn hơn 0!");
+      return rejectWithValue("Giá tiền phải lớn hơn 0!");
+    }
+    if (!product.stockInStorage || Number(product.stockInStorage) < 1) {
+      toast.error("⚠️ Số lượng tồn kho phải lớn hơn hoặc bằng 1!");
+      return rejectWithValue("Số lượng tồn kho phải lớn hơn hoặc bằng 1!");
+    }
     const newProductData = {
       productId: Number(product.productId),  // Chuyển thành số nguyên
       productName: product.productName,
@@ -87,11 +104,27 @@ export const addProduct = createAsyncThunk("products/addProduct", async (product
 });
 
 // Cập nhật sản phẩm
-
 export const updateProduct = createAsyncThunk(
   "products/updateProduct",
   async (product, { dispatch, rejectWithValue }) => {
     try {
+      // ❌ Kiểm tra dữ liệu đầu vào trước khi gửi API
+      if (!product.productName) {
+        toast.error("⚠️ Tên sản phẩm không được để trống!");
+        return rejectWithValue("Tên sản phẩm không được để trống!");
+      }
+      if (!product.categoryId) {
+        toast.error("⚠️ Danh mục sản phẩm là bắt buộc!");
+        return rejectWithValue("Danh mục sản phẩm là bắt buộc!");
+      }
+      if (!product.price || Number(product.price) <= 0) {
+        toast.error("⚠️ Giá tiền phải lớn hơn 0!");
+        return rejectWithValue("Giá tiền phải lớn hơn 0!");
+      }
+      if (!product.stockInStorage || Number(product.stockInStorage) < 1) {
+        toast.error("⚠️ Số lượng tồn kho phải lớn hơn hoặc bằng 1!");
+        return rejectWithValue("Số lượng tồn kho phải lớn hơn hoặc bằng 1!");
+      }
       const updatedData = {
         productId: Number(product.productId),  // Chuyển thành số nguyên
         productName: product.productName,
