@@ -108,6 +108,7 @@ const AppContent = () => {
           <Route path="/staff" element={<ProtectedRoute allowedRoles={[2]}><StaffPage /></ProtectedRoute>} />
           <Route path="/order-tracking/" element={<ProtectedRoute allowedRoles={[2]}><OrderTracking /></ProtectedRoute>} />
           <Route path="/order-detail/:orderId" element={<ProtectedRoute allowedRoles={[2]}><OrderDetail /></ProtectedRoute>} />
+          <Route path="/member" element={<ProtectedRoute allowedRoles={[2]}><MemberPage /></ProtectedRoute>} />
            {/* <Route path="/order-tracking/:orderId" element={<ProtectedRoute allowedRoles={[2]}><OrderTracking /></ProtectedRoute>} /> */}
 
 
