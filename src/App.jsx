@@ -102,18 +102,20 @@ const AppContent = () => {
           <Route path="/blog/class/:id" element={<NewsDetail />} />
           <Route path="/blog/b" element={<HandPage />} />
           <Route path="/blog/b/:id" element={<HandDetail />} />
+          <Route path="/blog/b/:id" element={<HandDetail />} />
           {/* <Route path="/order-detail" element={<OrderDetail />} /> */}
 
           {/* Protected routes for Staff (roleId = 2) */}
           <Route path="/staff" element={<ProtectedRoute allowedRoles={[2]}><StaffPage /></ProtectedRoute>} />
           <Route path="/order-tracking/" element={<ProtectedRoute allowedRoles={[2]}><OrderTracking /></ProtectedRoute>} />
           <Route path="/order-detail/:orderId" element={<ProtectedRoute allowedRoles={[2]}><OrderDetail /></ProtectedRoute>} />
-          <Route path="/member" element={<ProtectedRoute allowedRoles={[2]}><MemberPage /></ProtectedRoute>} />
+          {/* <Route path="/member" element={<ProtectedRoute allowedRoles={[2]}><MemberPage /></ProtectedRoute>} /> */}
            {/* <Route path="/order-tracking/:orderId" element={<ProtectedRoute allowedRoles={[2]}><OrderTracking /></ProtectedRoute>} /> */}
 
+           <Route path="/member" element={<ProtectedRoute allowedRoles={[2, 3]}><MemberPage /></ProtectedRoute>} />
 
           {/* Protected routes for Member (roleId = 3) */}
-          <Route path="/member" element={<ProtectedRoute allowedRoles={[3]}><MemberPage /></ProtectedRoute>} />
+          {/* <Route path="/member" element={<ProtectedRoute allowedRoles={[3]}><MemberPage /></ProtectedRoute>} /> */}
           <Route path="/cart" element={<ProtectedRoute allowedRoles={[3]}><Cart /></ProtectedRoute>} />
           <Route path="/product/:id" element={<ProtectedRoute allowedRoles={[3]}><ProductDetail /></ProtectedRoute>} />
           {/* <Route path="/design/custom" element={<ProtectedRoute allowedRoles={[3]}><DesignerPage /></ProtectedRoute>} />
