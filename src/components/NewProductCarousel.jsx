@@ -21,7 +21,7 @@ const NewProductCarousel = () => {
             <div className="bg-white rounded-lg shadow-md p-4 hover:scale-105 transition-transform">
               <img src={product.image} alt={product.name} className="w-full h-48 object-cover mb-2 rounded-md" />
               <h3 className="text-lg font-semibold text-gray-800">{product.name}</h3>
-              <p className="text-red-500 font-bold">{product.price} USD</p>
+              <p className="text-red-500 font-bold">{product.price} VND</p>
             </div>
           </SwiperSlide>
         ))}

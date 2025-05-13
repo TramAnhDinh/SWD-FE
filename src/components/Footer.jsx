@@ -15,11 +15,11 @@ const Footer = () => {
             <img src={logo} alt="Potato Clothing" className="w-56 mx-auto lg:mx-0 mb-2" />
           </div>
           <div className="w-80 ml-20">
-            <h3 className="font-bold text-lg">CÔNG TY TNHH ĐỒNG PHỤC POTATO CLOTHING</h3>
-            <p>MST: 0314721531</p>
-            <p>📍 12 Bà Huyện Thanh Quan, P. Võ Thị Sáu, Quận 3, TP.HCM</p>
-            <p>📞 078 608 6494</p>
-            <p>✉ info@potato.clothing</p>
+            <h3 className="font-bold text-lg">CÔNG TY TNHH DECAL POTATO</h3>
+            <p>MST: 0215721565</p>
+            <p>📍 32 Bà Huyện Thanh Quan, P. Võ Thị Sáu, Quận 3, TP.HCM</p>
+            <p>📞 098 608 6487</p>
+            <p>✉ info@potato.decal</p>
             <div className="mt-3 text-sm">
               <a href="#" className="hover:underline">Điều khoản sử dụng</a> |
               <a href="#" className="hover:underline"> Chính sách bảo mật</a> |

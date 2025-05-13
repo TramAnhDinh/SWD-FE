@@ -28,14 +28,14 @@ const Header = () => {
   // State cho menu trên mobile
   const [menuOpen, setMenuOpen] = useState(false);
   const [designDropdownOpen, setDesignDropdownOpen] = useState(false);
-  const [dongphuc, setDongphuc] = useState(false);
+  const [decal, setDecal] = useState(false);
 
   return (
     <header className="bg-black text-white py-2 px-6 flex items-center justify-between relative">
       {/* Logo */}
       <Link to="/" className="flex items-center space-x-2">
         <img src={logo} alt="Logo" className="w-16 h-16" />
-        <span className="text-3xl font-bold text-white">Clothing</span>
+        <span className="text-3xl font-bold text-white">Decal</span>
       </Link>
 
       {/* Nút Menu Dropdown (Mobile) */}
@@ -51,13 +51,13 @@ const Header = () => {
               <>
                 <Link to="/" className="block px-4 py-2 hover:bg-gray-800">TRANG CHỦ</Link>
 
-                {/* Dropdown Đồng Phục */}
+                {/* Dropdown Decal */}
                 <div>
                   <button className="block w-full text-left px-4 py-2 hover:bg-gray-800 flex items-center justify-between"
-                    onClick={() => setDongphuc(!dongphuc)}>
-                    ĐỒNG PHỤC <ChevronDown />
+                    onClick={() => setDecal(!decal)}>
+                    DECAL <ChevronDown />
                   </button>
-                  {dongphuc && (
+                  {decal && (
                     <div className="bg-gray-900">
                       <Link to="/design" className="block px-6 py-2 hover:bg-gray-800">TUỲ CHỈNH</Link>
                       <Link to="/design/templates" className="block px-6 py-2 hover:bg-gray-800">MẪU CÓ SẴN</Link>
@@ -69,11 +69,11 @@ const Header = () => {
                 <div>
                   <button className="block w-full text-left px-4 py-2 hover:bg-gray-800 flex items-center justify-between"
                     onClick={() => setDesignDropdownOpen(!designDropdownOpen)}>
-                    THIẾT KẾ ÁO <ChevronDown />
+                    THIẾT KẾ DECAL <ChevronDown />
                   </button>
                   {designDropdownOpen && (
                     <div className="bg-gray-900">
-                      {/* <Link to="/design" className="block px-6 py-2 hover:bg-gray-800">TUỲ CHỈNH</Link> */}
+                      <Link to="/design" className="block px-6 py-2 hover:bg-gray-800">TUỲ CHỈNH</Link>
                       <Link to="/design/templates" className="block px-6 py-2 hover:bg-gray-800">SẢN PHẨM</Link>
                     </div>
                   )}
@@ -119,21 +119,21 @@ const Header = () => {
             {/* Các dropdown khác */}
             <div className="relative group">
               <button className="hover:text-orange-400 text-xl flex items-center">
-                THIẾT KẾ ÁO <ChevronDown className="ml-2" />
+                THIẾT KẾ DECAL <ChevronDown className="ml-2" />
               </button>
               <div className="absolute left-0 top-full w-48 bg-black border border-gray-700 rounded-lg hidden group-hover:block z-50">
-                {/* <Link to="/design/custom" className="block px-4 py-2 hover:bg-gray-800">TUỲ CHỈNH</Link> */}
+                <Link to="/design/custom" className="block px-4 py-2 hover:bg-gray-800">TUỲ CHỈNH</Link>
                 <Link to="/design/mau-co-san" className="block px-4 py-2 hover:bg-gray-800">SẢN PHẨM</Link>
               </div>
             </div>
 
             <div className="relative group">
               <button className="hover:text-orange-400 text-xl flex items-center">
-                ĐỒNG PHỤC <ChevronDown className="ml-2" />
+                DECAL <ChevronDown className="ml-2" />
               </button>
               <div className="absolute left-0 top-full max-w-64 w-56 bg-black border border-gray-700 rounded-lg hidden group-hover:block z-50">
-                <Link to="/design/bang-gia-dong-phuc" className="block px-4 py-2 hover:bg-gray-800">BẢNG GIÁ ĐỒNG PHỤC</Link>
-                <Link to="/design/bang-gia-ao-lop" className="block px-4 py-2 hover:bg-gray-800">BẢNG GIÁ ÁO LỚP</Link>
+                <Link to="/design/bang-gia-dong-phuc" className="block px-4 py-2 hover:bg-gray-800">BẢNG GIÁ DECAL XE MÁY</Link>
+                <Link to="/design/bang-gia-ao-lop" className="block px-4 py-2 hover:bg-gray-800">BẢNG GIÁ DECAL XE HƠI</Link>
                 <Link to="/design/bang-gia-phu-kien" className="block px-4 py-2 hover:bg-gray-800">BẢNG GIÁ PHỤ KIỆN</Link>
                 <Link to="/design/bang-gia-dich-vu" className="block px-4 py-2 hover:bg-gray-800">BẢNG GIÁ DỊCH VỤ</Link>
               </div>
@@ -145,7 +145,7 @@ const Header = () => {
               </button>
               <div className="absolute left-0 top-full max-w-64 w-56 bg-black border border-gray-700 rounded-lg hidden group-hover:block z-50">
                 <Link to="/blog" className="block px-4 py-2 hover:bg-gray-800">THÔNG TIN</Link>
-                <Link to="/blog/class" className="block px-4 py-2 hover:bg-gray-800">ÁO LỚP</Link>
+                <Link to="/blog/class" className="block px-4 py-2 hover:bg-gray-800">DECAL</Link>
                 <Link to="/blog/b" className="block px-4 py-2 hover:bg-gray-800">CẨM NANG</Link>
               </div>
             </div>
